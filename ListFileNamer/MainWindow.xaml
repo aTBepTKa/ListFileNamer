@@ -5,80 +5,126 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ListFileNamer"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="1016">
+        Title="ListFileNamer" Height="600" Width="1200" WindowStartupLocation="CenterScreen" WindowState="Maximized">
+    
     <Window.Resources>
         <Style x:Key="TextWrapping">
             <Setter Property="TextBlock.TextWrapping" Value="Wrap"/>
         </Style>
+        <Style x:Key="PropertiesButton" TargetType="Button">
+            <Setter Property="Margin" Value="5,5,0,5"/>
+            <Setter Property="Padding" Value="5,3,5,3"/>
+        </Style>
     </Window.Resources>
+    
     <Grid ScrollViewer.CanContentScroll="True">
-        <DockPanel>
-            <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
-                <Button x:Name="LoadButton" Content="Назначить пути" Margin="10,0,10,0" Click="LoadButton_Click"/>
-                <Button x:Name="FindScanButton" Content="Найти сканы" Margin="0,0,10,0" Click="FindScanButton_Click"></Button>
-            </StackPanel>
-            <DataGrid x:Name="DocListDG" 
+        <Grid.RowDefinitions>
+            <RowDefinition Height="30"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="465*"/>
+            <ColumnDefinition Width="280" MinWidth="280"/>
+        </Grid.ColumnDefinitions>
+
+        <ToolBarPanel Grid.ColumnSpan="2">
+            <ToolBar>
+                <Button x:Name="LoadButton" Content="Назначить пути" Click="LoadButton_Click"/>
+                <Button x:Name="FindScanButton" Content="Найти сканы" Click="FindScanButton_Click"></Button>
+            </ToolBar>
+        </ToolBarPanel>
+
+        <DataGrid x:Name="DocListDG" 
                       AutoGenerateColumns="False" 
                       VerticalScrollBarVisibility="Auto" 
                       HorizontalScrollBarVisibility="Auto"
                       IsSynchronizedWithCurrentItem="True"
-                      SelectionMode="Single">
-                <DataGrid.Columns>
-                    <DataGridTextColumn Header="Id" Binding="{Binding Path=Id}" Width="20"/>
-                    <DataGridTextColumn Header="Стр." Binding="{Binding Path=PageNumber}" Width="40"/>
-                    <DataGridTextColumn Header="Наименование документа" Binding="{Binding Path=DocName}" ElementStyle="{StaticResource TextWrapping}" Width="200"/>
-                    <DataGridTextColumn Header="Номер документа" Binding="{Binding Path=DocNumber}" ElementStyle="{StaticResource TextWrapping}" Width="100"/>
-                    <DataGridTextColumn Header="Путь к папке" Binding="{Binding Path=FindFolder}" ElementStyle="{StaticResource TextWrapping}" Width="200">
-                        <DataGridTextColumn.CellStyle>
-                            <Style TargetType="DataGridCell">
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding Path=FindFolderIsExist}" Value="False">
-                                        <Setter Property="Background" Value="Tomato"/>
-                                        <Setter Property="ToolTip" Value="Папка не найдена"/>
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </DataGridTextColumn.CellStyle>
-                    </DataGridTextColumn>
-                    <DataGridTextColumn Header="Путь к файлу" Binding="{Binding Path=ScanFileName}" ElementStyle="{StaticResource TextWrapping}" Width="200"/>
-                    <DataGridTextColumn Header="Новое имя файла" Binding="{Binding Path=NewFileName}" ElementStyle="{StaticResource TextWrapping}" Width="150"/>
-                </DataGrid.Columns>
+                      SelectionMode="Single" Grid.Row="1">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Id" Binding="{Binding Path=Id}" Width="20"/>
+                <DataGridTextColumn Header="Путь к папке" Binding="{Binding Path=FindFolder}" ElementStyle="{StaticResource TextWrapping}" Width="200">
+                    <DataGridTextColumn.CellStyle>
+                        <Style TargetType="DataGridCell">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Path=FindFolderIsExist}" Value="False">
+                                    <Setter Property="Background" Value="Tomato"/>
+                                    <Setter Property="ToolTip" Value="Папка не найдена"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </DataGridTextColumn.CellStyle>
+                </DataGridTextColumn>
+                <DataGridTextColumn Header="Стр." Binding="{Binding Path=PageNumber}" Width="40"/>
+                <DataGridTextColumn Header="Наименование документа" Binding="{Binding Path=DocName}" ElementStyle="{StaticResource TextWrapping}" Width="200"/>
+                <DataGridTextColumn Header="Номер документа" Binding="{Binding Path=DocNumber}" ElementStyle="{StaticResource TextWrapping}" Width="100"/>
+                <DataGridTextColumn Header="Имя файла" Binding="{Binding Path=ScanFileName}" ElementStyle="{StaticResource TextWrapping}" Width="200"/>
+                <DataGridTextColumn Header="Новое имя файла" Binding="{Binding Path=NewFileName}" ElementStyle="{StaticResource TextWrapping}" Width="150"/>
+            </DataGrid.Columns>
 
-                <DataGrid.RowStyle>
-                    <Style TargetType="DataGridRow">
-                        <Style.Triggers>
-                            <MultiDataTrigger>
-                                <MultiDataTrigger.Conditions>
-                                    <Condition Binding="{Binding Path=IsAct}" Value="False"/>
-                                    <Condition Binding="{Binding Path=IsPrimary}" Value="True"/>
-                                </MultiDataTrigger.Conditions>
-                                <MultiDataTrigger.Setters>
-                                    <Setter Property="Background" Value="LightSkyBlue"/>
-                                    <Setter Property="FontWeight" Value="Bold"/>
-                                </MultiDataTrigger.Setters>
-                            </MultiDataTrigger>
-                            <MultiDataTrigger>
-                                <MultiDataTrigger.Conditions>
-                                    <Condition Binding="{Binding Path=IsAct}" Value="True"/>
-                                    <Condition Binding="{Binding Path=IsPrimary}" Value="True"/>
-                                </MultiDataTrigger.Conditions>
-                                <MultiDataTrigger.Setters>
-                                    <!--<Setter Property="Background" Value="LightGreen"/>-->
-                                    <Setter Property="FontWeight" Value="Bold"/>
-                                </MultiDataTrigger.Setters>
-                            </MultiDataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </DataGrid.RowStyle>
+            <DataGrid.RowStyle>
+                <Style TargetType="DataGridRow">
+                    <Style.Triggers>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding Path=IsAct}" Value="False"/>
+                                <Condition Binding="{Binding Path=IsPrimary}" Value="True"/>
+                            </MultiDataTrigger.Conditions>
+                            <MultiDataTrigger.Setters>
+                                <!--<Setter Property="Background" Value="LightSkyBlue"/>-->
+                                <Setter Property="FontWeight" Value="Bold"/>
+                            </MultiDataTrigger.Setters>
+                        </MultiDataTrigger>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding Path=IsAct}" Value="True"/>
+                                <Condition Binding="{Binding Path=IsPrimary}" Value="True"/>
+                            </MultiDataTrigger.Conditions>
+                            <MultiDataTrigger.Setters>
+                                <!--<Setter Property="Background" Value="LightGreen"/>-->
+                                <Setter Property="FontWeight" Value="Bold"/>
+                            </MultiDataTrigger.Setters>
+                        </MultiDataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </DataGrid.RowStyle>
 
-                <DataGrid.RowDetailsTemplate>
-                    <DataTemplate>
-                        <Grid MaxHeight="100">
-                            <ListBox x:Name="ListBoxRowTemplate" ItemsSource="{Binding ScanFileNameVariants}" SelectionChanged="ListBoxRowTemplate_SelectionChanged"/>
-                        </Grid>
-                    </DataTemplate>
-                </DataGrid.RowDetailsTemplate>
-            </DataGrid>            
+            <DataGrid.RowDetailsTemplate>
+                <DataTemplate>
+                    <Grid MaxHeight="100">
+                        <ListBox x:Name="ListBoxRowTemplate" ItemsSource="{Binding ScanFileNameVariants}" Margin="560,0,0,0" HorizontalAlignment="Stretch" SelectionChanged="ListBoxRowTemplate_SelectionChanged"/>
+                    </Grid>
+                </DataTemplate>
+            </DataGrid.RowDetailsTemplate>
+        </DataGrid>
+
+        <GridSplitter Grid.Column="0"
+                      Grid.Row="1"
+                      Grid.RowSpan="2"
+                      Background="Gray"
+                      Width="3"
+                      VerticalAlignment="Stretch"/>
+
+        <DockPanel Name="RowProperties" Grid.Column="1" Grid.Row="1">
+            <Label DockPanel.Dock="Top" Background="LightGray" FontWeight="Bold">Параметры записи</Label>
+            
+            <GroupBox Header="Параметры пути" DockPanel.Dock="Top">
+                <StackPanel>
+                    <Label>Папка со сканами:</Label>
+                    <DockPanel LastChildFill="True">
+                        <Button x:Name="SetScanFolderTextBox" DockPanel.Dock="Right" Click="SetScanFolderTextBox_Click" Margin="5,0,0,0">Выбрать</Button>
+                        <TextBox x:Name="ScanFolderTextBox" Text="{Binding Path=FindFolder, Mode=OneWay, UpdateSourceTrigger=Explicit}" TextWrapping="Wrap"/>
+                    </DockPanel>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                        <Button x:Name="SetScanRowButton" Style="{StaticResource PropertiesButton}" Click="SetScanRowButton_Click">Выбрать для текущего</Button>
+                        <Button x:Name="SetScanGroupButton" Style="{StaticResource PropertiesButton}" Click="SetScanGroupButton_Click">Выбрать для группы</Button>
+                    </StackPanel>
+                </StackPanel>
+            </GroupBox>
+
+            <GroupBox Header="Содержимое папки" DockPanel.Dock="Top">
+                <ListBox x:Name="ListBoxRowProrepty" ItemsSource="{Binding ScanFileNameVariants}" SelectionChanged="ListBoxRowTemplate_SelectionChanged"/>
+            </GroupBox>
         </DockPanel>
     </Grid>
 </Window>

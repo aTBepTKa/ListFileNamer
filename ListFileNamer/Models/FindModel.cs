@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace ListFileNamer.Services.FindScanService.Models
+namespace ListFileNamer.Models
 {
     class FindModel
     {
@@ -10,6 +10,14 @@ namespace ListFileNamer.Services.FindScanService.Models
         /// Id документа из перечня.
         /// </summary>
         public int Id { get; set; }
+
+        /// <summary>
+        /// Id группы документов.
+        /// </summary>
+        /// <remarks>
+        /// Акт с приложениями является одной группой.
+        /// </remarks>
+        public int GroupId { get; set; }
 
         /// <summary>
         /// Номер страницы документа.
@@ -54,7 +62,7 @@ namespace ListFileNamer.Services.FindScanService.Models
         /// <summary>
         /// Возможные варианты имени файла.
         /// </summary>
-        public IEnumerable<string> ScanFileNameVariants { get; set; }
+        public IEnumerable<string> ScanFilePathVariants { get; set; }
 
         /// <summary>
         /// Точное совпадение при поиске.

@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using ExcelDataReader;
-using System.IO;
-using System.Data;
-using System.Text.Encodings;
+﻿using ExcelDataReader;
 using ListFileNamer.Models;
+using System.Collections.Generic;
+using System.Data;
+using System.IO;
 
 namespace ListFileNamer.Services
 {

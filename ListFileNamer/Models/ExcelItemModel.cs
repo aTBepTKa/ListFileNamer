@@ -6,6 +6,7 @@
     public class ExcelItemModel
     {
         public int Id { get; set; }
+
         /// <summary>
         /// Основной документ.
         /// </summary>

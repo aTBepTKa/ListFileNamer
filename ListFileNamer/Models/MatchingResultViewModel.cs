@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
+using System.Linq;
 using System.Text;
 
 namespace ListFileNamer.Models
@@ -8,15 +10,24 @@ namespace ListFileNamer.Models
     /// <summary>
     /// Результат сопоставления файлов.
     /// </summary>
-    public class MatchingResultModel : INotifyPropertyChanged
+    public class MatchingResultViewModel : INotifyPropertyChanged
     {
         private string scanFileName;
         private string newFileName;
+        private string findFolder;
+        private bool findFolderIsExist;
+        private IEnumerable<string> scanFileNameVariants;
 
         /// <summary>
         /// Id документа из перечня.
         /// </summary>
         public int Id { get; set; }
+
+        /// <summary>
+        /// Id группы документов.
+        /// </summary>
+        /// <remarks>Акт с приложениями является одной группой.</remarks>
+        public int GroupId { get; set; }
 
         /// <summary>
         /// Номер страницы документа.
@@ -46,12 +57,20 @@ namespace ListFileNamer.Models
         /// <summary>
         /// Папка для выполнения поиска документа.
         /// </summary>
-        public string FindFolder { get; set; }
+        public string FindFolder
+        {
+            get => findFolder;
+            set => SetField(ref findFolder, value, "FindFolder");
+        }
 
         /// <summary>
         /// Папка для документа существует.
         /// </summary>
-        public bool FindFolderIsExist { get; set; }
+        public bool FindFolderIsExist
+        {
+            get => findFolderIsExist;
+            set => SetField(ref findFolderIsExist, value, "findFolderIsExist");
+        }
 
         /// <summary>
         /// Имя найденного файла.
@@ -74,7 +93,19 @@ namespace ListFileNamer.Models
         /// <summary>
         /// Возможные варианты имени файла.
         /// </summary>
-        public List<string> ScanFileNameVariants { get; set; }
+        public IEnumerable<string> ScanFilePathVariants
+        {
+            get => scanFileNameVariants;
+            set => SetField(ref scanFileNameVariants, value, "scanFileNameVariants");
+        }
+
+        /// <summary>
+        /// Возможные варианты имени файла.
+        /// </summary>
+        public IEnumerable<string> ScanFileNameVariants
+        {
+            get => ScanFilePathVariants.Select(x => Path.GetFileName(x));            
+        }
 
         /// <summary>
         /// Точное совпадение при поиске.

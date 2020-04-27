@@ -1,7 +1,5 @@
 ﻿using ListFileNamer.Models;
 using ListFileNamer.Services;
-using ListFileNamer.Services.FindScanService;
-using ListFileNamer.Services.FindScanService.Models;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -18,6 +16,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Configuration;
 using System.IO;
+using Microsoft.WindowsAPICodePack.Dialogs;
 
 namespace ListFileNamer
 {
@@ -40,7 +39,7 @@ namespace ListFileNamer
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
         }
-        public static ObservableCollection<MatchingResultModel> MatchingResultModels { get; set; }
+        public static ObservableCollection<MatchingResultViewModel> MatchingResultModels { get; set; }
         public static ObservableCollection<string> OLOLO { get; set; }
 
         /// <summary>
@@ -74,9 +73,10 @@ namespace ListFileNamer
             var excelList = ExcelService.GetList();
 
             FindScanService = new FindScanService(FindScanServicePath);
-            var result = FindScanService.GetMatchingResult(excelList);
-            MatchingResultModels = new ObservableCollection<MatchingResultModel>(result);
+            var result = FindScanService.GetMatchingResultFromExcel(excelList);
+            MatchingResultModels = new ObservableCollection<MatchingResultViewModel>(result);
             DocListDG.ItemsSource = MatchingResultModels;
+            RowProperties.DataContext = MatchingResultModels;
         }
 
         private void ListBoxRowTemplate_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -84,15 +84,43 @@ namespace ListFileNamer
             var fileName = (sender as ListBox).SelectedItem;
             if (fileName != null)
                 SetNewFileName((string)fileName);
-
         }
 
         private void SetNewFileName(string filePath)
         {
-            var item = (MatchingResultModel)DocListDG.SelectedItem;
+            var item = (MatchingResultViewModel)DocListDG.SelectedItem;
             item.ScanFileName = filePath;
             var fileName = Path.GetFileName(filePath);
             item.NewFileName = $"Стр. {item.PageNumber}. {fileName}";
+        }
+
+        // Установить папку сканов для одной строки.
+        private void SetScanRowButton_Click(object sender, RoutedEventArgs e)
+        {
+            var item = (MatchingResultViewModel)DocListDG.SelectedItem;
+            var path = ScanFolderTextBox.Text;
+            FindScanService.SetScanFolderRecord(item, path);
+        }
+
+        // Установить папку сканов для акта и всех документов.
+        private void SetScanGroupButton_Click(object sender, RoutedEventArgs e)
+        {
+            var models = MatchingResultModels;
+            var groupId = ((MatchingResultViewModel)DocListDG.SelectedItem).GroupId;
+            var path = ScanFolderTextBox.Text;
+            FindScanService.SetScanFolderGroup(models, groupId, path);
+        }
+
+        private void SetScanFolderTextBox_Click(object sender, RoutedEventArgs e)
+        {
+            var dialog = new CommonOpenFileDialog
+            {
+                IsFolderPicker = true
+            };
+            if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
+            {
+                ScanFolderTextBox.SetCurrentValue(TextBox.TextProperty, dialog.FileName);
+            }
         }
     }
 }

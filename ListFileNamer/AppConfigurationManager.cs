@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Text;
+﻿using System.Configuration;
 
-namespace ListFileNamer.Services
+namespace ListFileNamer
 {
     /// <summary>
     /// Работа с настройками приложения.
@@ -80,6 +77,6 @@ namespace ListFileNamer.Services
         /// <param name="startRow">Начальная строка.</param>
         /// <param name="endRow">Конечная строка.</param>
         public void SaveStartEndRows(int startRow, int endRow) =>
-            SaveStartEndRows(startRow.ToString(), endRow.ToString());            
+            SaveStartEndRows(startRow.ToString(), endRow.ToString());
     }
 }
