@@ -21,6 +21,7 @@ using ListFileNamer.Services.Excel;
 using ListFileNamer.Services.WorkProject;
 using Mapster;
 using ListFileNamer.Models.Interfaces;
+using ListFileNamer.Services.CollectFiles;
 
 namespace ListFileNamer
 {
@@ -76,13 +77,9 @@ namespace ListFileNamer
         {
             ExcelService = new ExcelService(ProjectProperties);
             var excelList = ExcelService.GetList();
-
             FindScanService = new FindScanService(ProjectProperties);
-            var result = FindScanService.GetMatchingResultFromExcel(excelList);
-            MatchingResultModels = new ObservableCollection<MatchingResultViewModel>(result);
-
-            DocListDG.ItemsSource = MatchingResultModels;
-            RowProperties.DataContext = MatchingResultModels;
+            var result = FindScanService.GetMatchingResultFromExcel(excelList).Adapt<IEnumerable<MatchingResultViewModel>>();
+            SetMatchingResult(result);
         }
 
         // Событие изменения выделенной записи в списке файлов.
@@ -135,7 +132,9 @@ namespace ListFileNamer
         // Созранить сканы с новыми именами в папку.
         private void SaveScanButton_Click(object sender, RoutedEventArgs e)
         {
-
+            var destinationPath = ProjectProperties.SaveResultPath;
+            CollectFilesService filesService = new CollectFilesService();
+            filesService.CollectFiles(MatchingResultModels, destinationPath);
         }
 
         // Диалог выбора папки для сохранения сканов.
@@ -151,9 +150,9 @@ namespace ListFileNamer
         }
 
         // Сохранить проект как.
-        private void SaveAsProject_Click(object sender, RoutedEventArgs e)
+        private async void SaveAsProject_Click(object sender, RoutedEventArgs e)
         {
-            WorkProjectService.SaveAsAsync(MatchingResultModels, ProjectProperties, "project1.lfn").Wait();
+            await WorkProjectService.SaveAsAsync(MatchingResultModels, ProjectProperties, "project1.lfn");
         }
 
         // Открыть проект.
@@ -162,10 +161,16 @@ namespace ListFileNamer
             var project = WorkProjectService.Open("project1.lfn");
 
             var matchingResults = project.MatchingResults.Adapt<IEnumerable<MatchingResultViewModel>>();
+            SetMatchingResult(matchingResults);
+
+            ProjectProperties = project.ServiceProperties.Adapt<ProjectPropertiesViewModel>();
+        }
+
+        private void SetMatchingResult(IEnumerable<MatchingResultViewModel> matchingResults)
+        {
             MatchingResultModels = new ObservableCollection<MatchingResultViewModel>(matchingResults);
             DocListDG.ItemsSource = MatchingResultModels;
-
-            ProjectProperties = project.ServiceProperties.Adapt<ProjectPropertiesModel>();
+            RowProperties.DataContext = MatchingResultModels;
         }
     }
 }

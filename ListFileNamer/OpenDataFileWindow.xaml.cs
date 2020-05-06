@@ -90,7 +90,7 @@ namespace ListFileNamer
                 return;
             }
 
-            ProjectProperties = new ProjectPropertiesModel()
+            ProjectProperties = new ProjectPropertiesViewModel()
             {
                 ExcelServicePath = docListPath,
                 FindScanServicePath = scanPath,

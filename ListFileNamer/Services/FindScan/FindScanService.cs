@@ -24,7 +24,7 @@ namespace ListFileNamer.Services.FindScan
         /// </summary>
         /// <param name="excelItems">Документы перечня.</param>
         /// <returns></returns>
-        public IEnumerable<MatchingResultViewModel> GetMatchingResultFromExcel(IEnumerable<ExcelItemModel> excelItems)
+        public IEnumerable<FindModel> GetMatchingResultFromExcel(IEnumerable<ExcelItemModel> excelItems)
         {
             FindModels = excelItems.Select(x => new FindModel
             {
@@ -37,8 +37,7 @@ namespace ListFileNamer.Services.FindScan
 
             var comparer = new FileNameComparer(baseFolderPath);
             var compareResult = comparer.GetMatchingResults(FindModels);
-            var resultModel = compareResult.Adapt<IEnumerable<MatchingResultViewModel>>();
-            return resultModel;
+            return compareResult;
         }
 
         /// <summary>

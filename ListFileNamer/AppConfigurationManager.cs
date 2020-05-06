@@ -34,7 +34,7 @@ namespace ListFileNamer
         /// <returns></returns>
         public IProjectProperties GetProjectProperties()
         {
-            var projectProperties = new ProjectPropertiesModel()
+            var projectProperties = new ProjectPropertiesViewModel()
             {
                 ExcelServicePath = ConfigurationManager.AppSettings[DocListFilePathKey],
                 FindScanServicePath = ConfigurationManager.AppSettings[ScanFolderPathKey]

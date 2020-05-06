@@ -4,7 +4,7 @@ using System.Text;
 
 namespace ListFileNamer.Services.FindScan
 {
-    class FindModel
+    public class FindModel
     {
         /// <summary>
         /// Id документа из перечня.

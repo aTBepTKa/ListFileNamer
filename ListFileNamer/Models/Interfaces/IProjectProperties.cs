@@ -1,4 +1,5 @@
-﻿using ListFileNamer.Services.Excel;
+﻿using ListFileNamer.Services.CollectFiles;
+using ListFileNamer.Services.Excel;
 using ListFileNamer.Services.FindScan;
 using System;
 using System.Collections.Generic;
@@ -9,11 +10,8 @@ namespace ListFileNamer.Models.Interfaces
     /// <summary>
     ///  Настройки сервисов и проекта.
     /// </summary>
-    public interface IProjectProperties : IExcelServiceProperties, IFindScanServiceProperties
+    public interface IProjectProperties : IExcelServiceProperties, IFindScanServiceProperties, ICollectFilesProperties
     {
-        /// <summary>
-        /// Путь к папке сохранения переименованных сканов (результат рарботы программы).
-        /// </summary>
-        string SaveResultPath { get; set; }
+
     }
 }
