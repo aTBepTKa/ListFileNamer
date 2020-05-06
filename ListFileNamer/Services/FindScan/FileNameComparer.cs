@@ -1,5 +1,4 @@
-﻿using ListFileNamer.Models;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
@@ -7,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace ListFileNamer.Services
+namespace ListFileNamer.Services.FindScan
 {
     class FileNameComparer
     {
@@ -83,11 +82,11 @@ namespace ListFileNamer.Services
         /// <param name="findModel"></param>
         private void SetScanFile(FindModel findModel)
         {
-            findModel.ScanFilePathVariants = GetFolderFiles(findModel.FindFolder);
+            findModel.ScanFileNameVariants = GetFolderFiles(findModel.FindFolder);
         }
 
         private IEnumerable<string> GetFolderFiles(string folderPath)
-        {                        
+        {
             IEnumerable<string> fileEntries;
             if (Directory.Exists(folderPath))
                 fileEntries = Directory.GetFiles(folderPath);

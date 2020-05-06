@@ -4,9 +4,10 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ListFileNamer"
+        xmlns:converters="clr-namespace:ListFileNamer.Converters"
         mc:Ignorable="d"
         Title="ListFileNamer" Height="600" Width="1200" WindowStartupLocation="CenterScreen" WindowState="Maximized">
-    
+
     <Window.Resources>
         <Style x:Key="TextWrapping">
             <Setter Property="TextBlock.TextWrapping" Value="Wrap"/>
@@ -15,8 +16,12 @@
             <Setter Property="Margin" Value="5,5,0,5"/>
             <Setter Property="Padding" Value="5,3,5,3"/>
         </Style>
+        <Style x:Key="ToolBarButton" TargetType="Button">
+            <Setter Property="BorderBrush" Value="Black"/>            
+        </Style>
+        <converters:FileNameConverter x:Key="fileNameConverter"/>
     </Window.Resources>
-    
+
     <Grid ScrollViewer.CanContentScroll="True">
         <Grid.RowDefinitions>
             <RowDefinition Height="30"/>
@@ -30,20 +35,29 @@
 
         <ToolBarPanel Grid.ColumnSpan="2">
             <ToolBar>
-                <Button x:Name="LoadButton" Content="Назначить пути" Click="LoadButton_Click"/>
-                <Button x:Name="FindScanButton" Content="Найти сканы" Click="FindScanButton_Click"></Button>
+                <Button x:Name="SaveProject" Content="Сохранить" Click="SaveProject_Click"/>
+                <Button x:Name="SaveAsProject" Content="Сохранить как" Click="SaveAsProject_Click"/>
+                <Button x:Name="OpenProject" Content="Открыть" Click="OpenProject_Click"/>
+                <Separator/>
+                <Button x:Name="LoadButton" Content="Импортировать перечень" Click="LoadButton_Click"/>
+                <!--<Button x:Name="FindScanButton" Content="Найти сканы" Click="FindScanButton_Click"/>-->
+                <Separator/>
+                <Label FontStyle="Italic">Сохранить в:</Label>
+                <TextBox x:Name="SaveScanTextBox" Width="200"/>
+                <Button x:Name="SelectScanButton" Content="Выбрать" Click="SelectScanButton_Click"/>
+                <Button x:Name="SaveScanButton" Content="Сохранить сканы" Click="SaveScanButton_Click"/>
             </ToolBar>
         </ToolBarPanel>
 
         <DataGrid x:Name="DocListDG" 
-                      AutoGenerateColumns="False" 
-                      VerticalScrollBarVisibility="Auto" 
-                      HorizontalScrollBarVisibility="Auto"
-                      IsSynchronizedWithCurrentItem="True"
-                      SelectionMode="Single" Grid.Row="1">
+                        AutoGenerateColumns="False" 
+                        VerticalScrollBarVisibility="Auto" 
+                        HorizontalScrollBarVisibility="Auto"
+                        IsSynchronizedWithCurrentItem="True"
+                        SelectionMode="Single" Grid.Row="1">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Id" Binding="{Binding Path=Id}" Width="20"/>
-                <DataGridTextColumn Header="Путь к папке" Binding="{Binding Path=FindFolder}" ElementStyle="{StaticResource TextWrapping}" Width="200">
+                <DataGridTextColumn Header="Папка" Binding="{Binding Path=FindFolder}" ElementStyle="{StaticResource TextWrapping}" Width="200">
                     <DataGridTextColumn.CellStyle>
                         <Style TargetType="DataGridCell">
                             <Style.Triggers>
@@ -57,8 +71,8 @@
                 </DataGridTextColumn>
                 <DataGridTextColumn Header="Стр." Binding="{Binding Path=PageNumber}" Width="40"/>
                 <DataGridTextColumn Header="Наименование документа" Binding="{Binding Path=DocName}" ElementStyle="{StaticResource TextWrapping}" Width="200"/>
-                <DataGridTextColumn Header="Номер документа" Binding="{Binding Path=DocNumber}" ElementStyle="{StaticResource TextWrapping}" Width="100"/>
-                <DataGridTextColumn Header="Имя файла" Binding="{Binding Path=ScanFileName}" ElementStyle="{StaticResource TextWrapping}" Width="200"/>
+                <DataGridTextColumn Header="Номер документа" Binding="{Binding Path=DocNumber}" ElementStyle="{StaticResource TextWrapping}" Width="130"/>
+                <DataGridTextColumn Header="Имя файла" Binding="{Binding Path=ScanFileName, Converter={StaticResource fileNameConverter}}" ElementStyle="{StaticResource TextWrapping}" Width="200"/>
                 <DataGridTextColumn Header="Новое имя файла" Binding="{Binding Path=NewFileName}" ElementStyle="{StaticResource TextWrapping}" Width="150"/>
             </DataGrid.Columns>
 
@@ -92,7 +106,13 @@
             <DataGrid.RowDetailsTemplate>
                 <DataTemplate>
                     <Grid MaxHeight="100">
-                        <ListBox x:Name="ListBoxRowTemplate" ItemsSource="{Binding ScanFileNameVariants}" Margin="560,0,0,0" HorizontalAlignment="Stretch" SelectionChanged="ListBoxRowTemplate_SelectionChanged"/>
+                        <ListBox x:Name="ListBoxRowTemplate" ItemsSource="{Binding ScanFileNameVariants}" SelectionChanged="ListBoxRowTemplate_SelectionChanged">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Converter={StaticResource fileNameConverter}}"/>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
                     </Grid>
                 </DataTemplate>
             </DataGrid.RowDetailsTemplate>
@@ -107,7 +127,7 @@
 
         <DockPanel Name="RowProperties" Grid.Column="1" Grid.Row="1">
             <Label DockPanel.Dock="Top" Background="LightGray" FontWeight="Bold">Параметры записи</Label>
-            
+
             <GroupBox Header="Параметры пути" DockPanel.Dock="Top">
                 <StackPanel>
                     <Label>Папка со сканами:</Label>
@@ -123,7 +143,13 @@
             </GroupBox>
 
             <GroupBox Header="Содержимое папки" DockPanel.Dock="Top">
-                <ListBox x:Name="ListBoxRowProrepty" ItemsSource="{Binding ScanFileNameVariants}" SelectionChanged="ListBoxRowTemplate_SelectionChanged"/>
+                <ListBox x:Name="ListBoxRowProrepty" ItemsSource="{Binding ScanFileNameVariants}" SelectionChanged="ListBoxRowTemplate_SelectionChanged">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Converter={StaticResource fileNameConverter}}" TextWrapping="Wrap"/>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
             </GroupBox>
         </DockPanel>
     </Grid>

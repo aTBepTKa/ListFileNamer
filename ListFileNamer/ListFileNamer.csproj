@@ -8,7 +8,6 @@
 
   <ItemGroup>
     <Folder Include="App_data\" />
-    <Folder Include="Storage\" />
   </ItemGroup>
 
   <ItemGroup>

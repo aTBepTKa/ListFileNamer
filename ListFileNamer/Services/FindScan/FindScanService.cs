@@ -1,21 +1,22 @@
 ﻿using ListFileNamer.Models;
+using ListFileNamer.Services.Excel;
 using Mapster;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-namespace ListFileNamer.Services
+namespace ListFileNamer.Services.FindScan
 {
     /// <summary>
     /// Сервис для поиска и работы со сканами документов и сопоставления их с записями перечня.
     /// </summary>
-    class FindScanService
+    public class FindScanService
     {
         private readonly string baseFolderPath;
         private IEnumerable<FindModel> FindModels { get; set; }
-        public FindScanService(string path)
+        public FindScanService(IFindScanServiceProperties serviceProperties)
         {
-            baseFolderPath = path;
+            baseFolderPath = serviceProperties.FindScanServicePath;
         }
 
         /// <summary>
@@ -31,8 +32,8 @@ namespace ListFileNamer.Services
                 PageNumber = x.PageNumber,
                 DocName = x.Name,
                 DocNumber = x.Number,
-                IsPrimary = x.IsPrimary                
-            }).ToArray();            
+                IsPrimary = x.IsPrimary
+            }).ToArray();
 
             var comparer = new FileNameComparer(baseFolderPath);
             var compareResult = comparer.GetMatchingResults(FindModels);
@@ -46,11 +47,11 @@ namespace ListFileNamer.Services
         /// <param name="model">Объект записи.</param>
         /// <param name="path">Адрес папки поиска.</param>
         /// <returns>Возвращает успешность задания пути.</returns>
-        public bool SetScanFolderRecord(MatchingResultViewModel model, string path)
+        public bool SetScanFolder(MatchingResultViewModel model, string path)
         {
             if (!Directory.Exists(path))
                 return false;
-            SetScanFolder(model, path);
+            SetFolder(model, path);
             return true;
         }
 
@@ -61,14 +62,14 @@ namespace ListFileNamer.Services
         /// <param name="groupId">Id группы для задания папки.</param>
         /// <param name="path">Адрес папки поиска.</param>
         /// <returns>Возвращает успешность задания пути.</returns>
-        public bool SetScanFolderGroup(IEnumerable<MatchingResultViewModel> models, int groupId, string path)
+        public bool SetScanFolder(IEnumerable<MatchingResultViewModel> models, int groupId, string path)
         {
             if (!Directory.Exists(path))
                 return false;
-            foreach(var model in models)
+            foreach (var model in models)
             {
                 if (model.GroupId == groupId)
-                    SetScanFolder(model, path);
+                    SetFolder(model, path);
             }
             return true;
 
@@ -79,11 +80,11 @@ namespace ListFileNamer.Services
         /// </summary>
         /// <param name="model">Объект записи.</param>
         /// <param name="path">Адрес папки поиска.</param>
-        private void SetScanFolder(MatchingResultViewModel model, string path)
+        private void SetFolder(MatchingResultViewModel model, string path)
         {
             model.FindFolder = path;
             model.FindFolderIsExist = true;
-            model.ScanFilePathVariants = Directory.GetFiles(path);
+            model.ScanFileNameVariants = Directory.GetFiles(path);
         }
     }
 }

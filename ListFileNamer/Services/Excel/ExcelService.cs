@@ -1,25 +1,21 @@
 ﻿using ExcelDataReader;
-using ListFileNamer.Models;
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
 
-namespace ListFileNamer.Services
+namespace ListFileNamer.Services.Excel
 {
     /// <summary>
     /// Средство для получения данных из таблицы Excel.
     /// </summary>
     class ExcelService
     {
-        private ColumnNames columnNames;
-        private int StartRow { get; set; }
-        private int EndRow { get; set; }
-        private string FilePath { get; set; }
-        public ExcelService(string filePath, int startRow, int endRow)
+        private readonly IExcelServiceProperties serviceProperties;
+        private readonly ColumnNames columnNames;
+
+        public ExcelService(IExcelServiceProperties serviceProperties)
         {
-            FilePath = filePath;
-            StartRow = startRow;
-            EndRow = endRow;
+            this.serviceProperties = serviceProperties;
 
             // Задать номера стобцов.
             columnNames = new ColumnNames
@@ -39,11 +35,11 @@ namespace ListFileNamer.Services
         /// <returns></returns>
         public IEnumerable<ExcelItemModel> GetList()
         {
-            var table = GetDataTable(FilePath);
+            var table = GetDataTable(serviceProperties.ExcelServicePath);
 
             var excelItems = new List<ExcelItemModel>(table.Rows.Count);
             var idCounter = 1;
-            for (int i = StartRow - 1; i < EndRow; i++)
+            for (int i = serviceProperties.StartExcelRow - 1; i < serviceProperties.EndExcelRow; i++)
             {
                 var tableRow = table.Rows[i];
 

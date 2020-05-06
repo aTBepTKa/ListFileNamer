@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ListFileNamer.Models.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
@@ -10,7 +11,7 @@ namespace ListFileNamer.Models
     /// <summary>
     /// Результат сопоставления файлов.
     /// </summary>
-    public class MatchingResultViewModel : INotifyPropertyChanged
+    public class MatchingResultViewModel : INotifyPropertyChanged, IMatchingResult
     {
         private string scanFileName;
         private string newFileName;
@@ -93,18 +94,10 @@ namespace ListFileNamer.Models
         /// <summary>
         /// Возможные варианты имени файла.
         /// </summary>
-        public IEnumerable<string> ScanFilePathVariants
+        public IEnumerable<string> ScanFileNameVariants
         {
             get => scanFileNameVariants;
             set => SetField(ref scanFileNameVariants, value, "scanFileNameVariants");
-        }
-
-        /// <summary>
-        /// Возможные варианты имени файла.
-        /// </summary>
-        public IEnumerable<string> ScanFileNameVariants
-        {
-            get => ScanFilePathVariants.Select(x => Path.GetFileName(x));            
         }
 
         /// <summary>

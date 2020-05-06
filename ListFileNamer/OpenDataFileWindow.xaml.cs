@@ -13,8 +13,10 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.IO;
 using Microsoft.WindowsAPICodePack.Dialogs;
-using ListFileNamer.Models;
 using System.Text.RegularExpressions;
+using ListFileNamer.Services.Excel;
+using ListFileNamer.Models.Interfaces;
+using ListFileNamer.Models;
 
 namespace ListFileNamer
 {
@@ -23,23 +25,19 @@ namespace ListFileNamer
     /// </summary>
     public partial class OpenDataFileWindow : Window
     {
-        public string DocListFilePath { get; set; }
-        public string ScanFolderPath { get; set; }
-        public int ExcelFirstRow { get; set; }
-        public int ExcelLastRow { get; set; }
+        public IProjectProperties ProjectProperties { get; set; }
 
-        public IEnumerable<ExcelItemModel> DocListItems { get; set; }
-        public OpenDataFileWindow(string filePath, string folderPath, int startRow, int endRow)
+        public OpenDataFileWindow(IProjectProperties projectProperties)
         {
             InitializeComponent();
-            DocListPathTextBox.Text = filePath;
-            ScanPathTextBox.Text = folderPath;
+            DocListPathTextBox.Text = projectProperties.ExcelServicePath;
+            ScanPathTextBox.Text = projectProperties.FindScanServicePath;
 
-            FirstRowTextBox.Text = startRow.ToString();
-            LastRowTextBox.Text = endRow.ToString();
+            FirstRowTextBox.Text = projectProperties.StartExcelRow.ToString();
+            LastRowTextBox.Text = projectProperties.EndExcelRow.ToString();
         }
 
-        private static readonly Regex integerRegex = new Regex(@"^[1-9]\d*$");
+        private static readonly Regex integerRegex = new Regex(@"^[0-9]\d*$");
 
         private void DocListPathButton_Click(object sender, RoutedEventArgs e)
         {
@@ -92,10 +90,14 @@ namespace ListFileNamer
                 return;
             }
 
-            DocListFilePath = docListPath;
-            ScanFolderPath = scanPath;
-            ExcelFirstRow = startRowInt;
-            ExcelLastRow = lastRowInt;
+            ProjectProperties = new ProjectPropertiesModel()
+            {
+                ExcelServicePath = docListPath,
+                FindScanServicePath = scanPath,
+                StartExcelRow = startRowInt,
+                EndExcelRow = lastRowInt
+            };
+
             DialogResult = true;
         }
 
@@ -106,6 +108,7 @@ namespace ListFileNamer
         
         private static bool IsTextAllowed(string text) =>
             !integerRegex.IsMatch(text);
+
         private void FirstRowTextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
         {
             e.Handled = IsTextAllowed(e.Text);

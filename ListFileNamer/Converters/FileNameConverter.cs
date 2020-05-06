@@ -12,7 +12,7 @@ namespace ListFileNamer.Converters
     public class FileNameConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture) =>
-            (value as IEnumerable<string>).Select(x => Path.GetFileName(x));
+            Path.GetFileName((string)value);
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) =>
              DependencyProperty.UnsetValue;

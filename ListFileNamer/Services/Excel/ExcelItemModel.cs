@@ -1,4 +1,4 @@
-﻿namespace ListFileNamer.Models
+﻿namespace ListFileNamer.Services.Excel
 {
     /// <summary>
     /// Документ перечня.

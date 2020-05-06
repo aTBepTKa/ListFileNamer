@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace ListFileNamer.Models
+namespace ListFileNamer.Services.FindScan
 {
     class FindModel
     {
@@ -62,7 +62,7 @@ namespace ListFileNamer.Models
         /// <summary>
         /// Возможные варианты имени файла.
         /// </summary>
-        public IEnumerable<string> ScanFilePathVariants { get; set; }
+        public IEnumerable<string> ScanFileNameVariants { get; set; }
 
         /// <summary>
         /// Точное совпадение при поиске.

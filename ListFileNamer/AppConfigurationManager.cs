@@ -1,82 +1,73 @@
-﻿using System.Configuration;
+﻿using ListFileNamer.Models;
+using ListFileNamer.Models.Interfaces;
+using System.Configuration;
+using System.Security.Policy;
 
 namespace ListFileNamer
 {
     /// <summary>
-    /// Работа с настройками приложения.
+    /// Работа с настройками приложения, сохраняемыми в файл.
     /// </summary>
     class AppConfigurationManager
     {
-        public string DocListFilePath => ConfigurationManager.AppSettings[DocListFilePathKey];
-        public string ScanFolderPath => ConfigurationManager.AppSettings[ScanFolderPathKey];
-        public int StartRow
-        {
-            get
-            {
-                if (int.TryParse(ConfigurationManager.AppSettings[StartRowKey], out int startRow))
-                    return startRow;
-                else
-                    return 12;
-            }
-        }
-        public int EndRow
-        {
-            get
-            {
-                if (int.TryParse(ConfigurationManager.AppSettings[EndRowKey], out int endRow))
-                    return endRow;
-                else
-                    return 12;
-            }
-        }
-
-
         private readonly string DocListFilePathKey = "DocListFilePath";
         private readonly string ScanFolderPathKey = "ScanFolderPath";
         private readonly string StartRowKey = "ExcelStartRow";
         private readonly string EndRowKey = "ExcelEndRow";
 
         /// <summary>
-        /// Сохранить пути к файлам.
+        /// Сохранить настройки проекта в файл.
         /// </summary>
-        /// <param name="docListFilePath">Расположение перечня.</param>
-        /// <param name="scanFolderPath">Расположение папки со сканами.</param>
-        public void SavePathes(string docListFilePath, string scanFolderPath)
+        /// <param name="projectProperties"></param>
+        public void SaveProperties(IProjectProperties projectProperties)
+        {
+            SaveProperty(DocListFilePathKey, projectProperties.ExcelServicePath);
+            SaveProperty(StartRowKey, projectProperties.StartExcelRow);
+            SaveProperty(EndRowKey, projectProperties.EndExcelRow);
+
+            SaveProperty(ScanFolderPathKey, projectProperties.FindScanServicePath);
+        }
+
+        /// <summary>
+        /// Загрузить настройки проекта из файла.
+        /// </summary>
+        /// <returns></returns>
+        public IProjectProperties GetProjectProperties()
+        {
+            var projectProperties = new ProjectPropertiesModel()
+            {
+                ExcelServicePath = ConfigurationManager.AppSettings[DocListFilePathKey],
+                FindScanServicePath = ConfigurationManager.AppSettings[ScanFolderPathKey]
+            };
+
+            if (int.TryParse(ConfigurationManager.AppSettings[StartRowKey], out int startRowParse))
+                projectProperties.StartExcelRow = startRowParse;
+            else
+                projectProperties.StartExcelRow = 1;
+
+            if (int.TryParse(ConfigurationManager.AppSettings[EndRowKey], out int endRowParse))
+                projectProperties.EndExcelRow = endRowParse;
+            else
+                projectProperties.EndExcelRow = 1;
+
+            return projectProperties;
+        }
+
+        /// <summary>
+        /// Сохранить настройку в файл.
+        /// </summary>
+        private void SaveProperty(string key, string value)
         {
             Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
-            config.AppSettings.Settings.Remove(DocListFilePathKey);
-            config.AppSettings.Settings.Add(DocListFilePathKey, docListFilePath);
-
-            config.AppSettings.Settings.Remove(ScanFolderPathKey);
-            config.AppSettings.Settings.Add(ScanFolderPathKey, scanFolderPath);
-
+            config.AppSettings.Settings.Remove(key);
+            config.AppSettings.Settings.Add(key, value);
             config.Save();
         }
 
         /// <summary>
-        /// Сохранить начальную и конечную строку считывания данных.
+        /// Сохранить настройку в файл.
         /// </summary>
-        /// <param name="startRow">Начальная строка.</param>
-        /// <param name="endRow">Конечная строка.</param>
-        public void SaveStartEndRows(string startRow, string endRow)
-        {
-            Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
-
-            config.AppSettings.Settings.Remove(StartRowKey);
-            config.AppSettings.Settings.Add(StartRowKey, startRow);
-
-            config.AppSettings.Settings.Remove(EndRowKey);
-            config.AppSettings.Settings.Add(EndRowKey, endRow);
-
-            config.Save();
-        }
-
-        /// <summary>
-        /// Сохранить начальную и конечную строку считывания данных.
-        /// </summary>
-        /// <param name="startRow">Начальная строка.</param>
-        /// <param name="endRow">Конечная строка.</param>
-        public void SaveStartEndRows(int startRow, int endRow) =>
-            SaveStartEndRows(startRow.ToString(), endRow.ToString());
+        private void SaveProperty(string key, int value) =>
+            SaveProperty(key, value.ToString());
     }
 }

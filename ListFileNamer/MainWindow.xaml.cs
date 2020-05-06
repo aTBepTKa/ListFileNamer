@@ -1,5 +1,4 @@
 ﻿using ListFileNamer.Models;
-using ListFileNamer.Services;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -17,6 +16,11 @@ using System.Windows.Navigation;
 using System.Configuration;
 using System.IO;
 using Microsoft.WindowsAPICodePack.Dialogs;
+using ListFileNamer.Services.FindScan;
+using ListFileNamer.Services.Excel;
+using ListFileNamer.Services.WorkProject;
+using Mapster;
+using ListFileNamer.Models.Interfaces;
 
 namespace ListFileNamer
 {
@@ -25,60 +29,63 @@ namespace ListFileNamer
     /// </summary>
     public partial class MainWindow : Window
     {
+        // Сервисы.
         private ExcelService ExcelService { get; set; }
-        private string ExcelServicePath { get; set; }
-        private int StartExcelRow { get; set; }
-        private int EndExcelRow { get; set; }
         private FindScanService FindScanService { get; set; }
-        private string FindScanServicePath { get; set; }
+
+        /// <summary>
+        /// Текущие настройки проекта.
+        /// </summary>
+        private IProjectProperties ProjectProperties { get; set; }
+
+        /// <summary>
+        /// Сервис сохранения текущих настроек прокта в файл.
+        /// </summary>
+        private AppConfigurationManager AppConfiguration { get; set; }
 
         public MainWindow()
         {
             InitializeComponent();
+            AppConfiguration = new AppConfigurationManager();
+            ProjectProperties = AppConfiguration.GetProjectProperties();
             // Добавить кодировку для чтения .xlsx файла.
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-
         }
-        public static ObservableCollection<MatchingResultViewModel> MatchingResultModels { get; set; }
-        public static ObservableCollection<string> OLOLO { get; set; }
 
         /// <summary>
-        /// Назначить рабочие пути.
+        /// Основная коллекция для хранения записей перечня и сканов.
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+        public static ObservableCollection<MatchingResultViewModel> MatchingResultModels { get; set; }
+
+        // Назначить пути для работы с файлами.
         private void LoadButton_Click(object sender, RoutedEventArgs e)
         {
-            var config = new AppConfigurationManager();
-            var openFileWindow = new OpenDataFileWindow(config.DocListFilePath, config.ScanFolderPath, config.StartRow, config.EndRow);
+            var openFileWindow = new OpenDataFileWindow(ProjectProperties);
             if (openFileWindow.ShowDialog() == true)
             {
-                ExcelServicePath = openFileWindow.DocListFilePath;
-                FindScanServicePath = openFileWindow.ScanFolderPath;
-                StartExcelRow = openFileWindow.ExcelFirstRow;
-                EndExcelRow = openFileWindow.ExcelLastRow;
-                config.SavePathes(ExcelServicePath, FindScanServicePath);
-                config.SaveStartEndRows(StartExcelRow, EndExcelRow);
+                ProjectProperties = openFileWindow.ProjectProperties;
+
+                var config = new AppConfigurationManager();
+                config.SaveProperties(ProjectProperties);
+                FindScanButton_Click(null, null);
             }
         }
 
-        /// <summary>
-        /// Найти файлы.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+        // Назначить сканы для записей в перечне.
         private void FindScanButton_Click(object sender, RoutedEventArgs e)
         {
-            ExcelService = new ExcelService(ExcelServicePath, StartExcelRow, EndExcelRow);
+            ExcelService = new ExcelService(ProjectProperties);
             var excelList = ExcelService.GetList();
 
-            FindScanService = new FindScanService(FindScanServicePath);
+            FindScanService = new FindScanService(ProjectProperties);
             var result = FindScanService.GetMatchingResultFromExcel(excelList);
             MatchingResultModels = new ObservableCollection<MatchingResultViewModel>(result);
+
             DocListDG.ItemsSource = MatchingResultModels;
             RowProperties.DataContext = MatchingResultModels;
         }
 
+        // Событие изменения выделенной записи в списке файлов.
         private void ListBoxRowTemplate_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             var fileName = (sender as ListBox).SelectedItem;
@@ -86,6 +93,7 @@ namespace ListFileNamer
                 SetNewFileName((string)fileName);
         }
 
+        // Задать имя нового файла для сохранения.
         private void SetNewFileName(string filePath)
         {
             var item = (MatchingResultViewModel)DocListDG.SelectedItem;
@@ -99,7 +107,7 @@ namespace ListFileNamer
         {
             var item = (MatchingResultViewModel)DocListDG.SelectedItem;
             var path = ScanFolderTextBox.Text;
-            FindScanService.SetScanFolderRecord(item, path);
+            FindScanService.SetScanFolder(item, path);
         }
 
         // Установить папку сканов для акта и всех документов.
@@ -108,9 +116,10 @@ namespace ListFileNamer
             var models = MatchingResultModels;
             var groupId = ((MatchingResultViewModel)DocListDG.SelectedItem).GroupId;
             var path = ScanFolderTextBox.Text;
-            FindScanService.SetScanFolderGroup(models, groupId, path);
+            FindScanService.SetScanFolder(models, groupId, path);
         }
 
+        // Диалог выбора папки для записи.
         private void SetScanFolderTextBox_Click(object sender, RoutedEventArgs e)
         {
             var dialog = new CommonOpenFileDialog
@@ -121,6 +130,42 @@ namespace ListFileNamer
             {
                 ScanFolderTextBox.SetCurrentValue(TextBox.TextProperty, dialog.FileName);
             }
+        }
+
+        // Созранить сканы с новыми именами в папку.
+        private void SaveScanButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        // Диалог выбора папки для сохранения сканов.
+        private void SelectScanButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        // Сохранить проект.
+        private void SaveProject_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        // Сохранить проект как.
+        private void SaveAsProject_Click(object sender, RoutedEventArgs e)
+        {
+            WorkProjectService.SaveAsAsync(MatchingResultModels, ProjectProperties, "project1.lfn").Wait();
+        }
+
+        // Открыть проект.
+        private void OpenProject_Click(object sender, RoutedEventArgs e)
+        {
+            var project = WorkProjectService.Open("project1.lfn");
+
+            var matchingResults = project.MatchingResults.Adapt<IEnumerable<MatchingResultViewModel>>();
+            MatchingResultModels = new ObservableCollection<MatchingResultViewModel>(matchingResults);
+            DocListDG.ItemsSource = MatchingResultModels;
+
+            ProjectProperties = project.ServiceProperties.Adapt<ProjectPropertiesModel>();
         }
     }
 }
