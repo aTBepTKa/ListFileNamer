@@ -12,7 +12,7 @@ namespace ListFileNamer.Services.WorkProject
         /// <summary>
         /// Настройки сервиса.
         /// </summary>
-        public ProjectPropertiesFile ServiceProperties { get; set; }
+        public ProjectPropertiesFile ProjectProperties { get; set; }
 
         /// <summary>
         /// Данные сопоставления.

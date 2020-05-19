@@ -25,7 +25,7 @@ namespace ListFileNamer
     /// </summary>
     public partial class OpenDataFileWindow : Window
     {
-        public IProjectProperties ProjectProperties { get; set; }
+        public ProjectPropertiesViewModel ProjectProperties { get; set; }
 
         public OpenDataFileWindow(IProjectProperties projectProperties)
         {

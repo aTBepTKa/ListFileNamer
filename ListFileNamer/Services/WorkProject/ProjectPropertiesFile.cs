@@ -15,5 +15,6 @@ namespace ListFileNamer.Services.WorkProject
         public int EndExcelRow { get; set; }
         public string FindScanServicePath { get; set; }
         public string SaveResultPath { get; set; }
+        public string ProjectFilePath { get; set; }
     }
 }

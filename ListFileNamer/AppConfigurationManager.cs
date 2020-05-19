@@ -32,7 +32,7 @@ namespace ListFileNamer
         /// Загрузить настройки проекта из файла.
         /// </summary>
         /// <returns></returns>
-        public IProjectProperties GetProjectProperties()
+        public ProjectPropertiesViewModel GetProjectProperties()
         {
             var projectProperties = new ProjectPropertiesViewModel()
             {

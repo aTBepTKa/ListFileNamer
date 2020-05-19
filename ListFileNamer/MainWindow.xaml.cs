@@ -22,6 +22,7 @@ using ListFileNamer.Services.WorkProject;
 using Mapster;
 using ListFileNamer.Models.Interfaces;
 using ListFileNamer.Services.CollectFiles;
+using Microsoft.Win32;
 
 namespace ListFileNamer
 {
@@ -37,7 +38,7 @@ namespace ListFileNamer
         /// <summary>
         /// Текущие настройки проекта.
         /// </summary>
-        private IProjectProperties ProjectProperties { get; set; }
+        public ProjectPropertiesViewModel ProjectProperties { get; set; }
 
         /// <summary>
         /// Сервис сохранения текущих настроек прокта в файл.
@@ -51,6 +52,9 @@ namespace ListFileNamer
             ProjectProperties = AppConfiguration.GetProjectProperties();
             // Добавить кодировку для чтения .xlsx файла.
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+
+            // Назначить DataContext.
+            SaveScanTextBox.DataContext = ProjectProperties;
         }
 
         /// <summary>
@@ -85,18 +89,15 @@ namespace ListFileNamer
         // Событие изменения выделенной записи в списке файлов.
         private void ListBoxRowTemplate_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            var fileName = (sender as ListBox).SelectedItem;
-            if (fileName != null)
-                SetNewFileName((string)fileName);
-        }
-
-        // Задать имя нового файла для сохранения.
-        private void SetNewFileName(string filePath)
-        {
-            var item = (MatchingResultViewModel)DocListDG.SelectedItem;
-            item.ScanFileName = filePath;
-            var fileName = Path.GetFileName(filePath);
-            item.NewFileName = $"Стр. {item.PageNumber}. {fileName}";
+            string filePath = (string)(sender as ListBox).SelectedItem;
+            if (filePath != null)
+            {
+                var item = (MatchingResultViewModel)DocListDG.SelectedItem;
+                item.ScanFileName = filePath;
+                item.NewDocName = Path.GetFileNameWithoutExtension(filePath);
+                var extension = Path.GetExtension(filePath);
+                item.NewFileName = $"Стр. {item.PageNumber}. {item.NewDocName}{extension}";
+            }
         }
 
         // Установить папку сканов для одной строки.
@@ -116,12 +117,13 @@ namespace ListFileNamer
             FindScanService.SetScanFolder(models, groupId, path);
         }
 
-        // Диалог выбора папки для записи.
-        private void SetScanFolderTextBox_Click(object sender, RoutedEventArgs e)
+        // Диалог выбора папки с исходными сканами.
+        private void SelectScanFolderButton_Click(object sender, RoutedEventArgs e)
         {
             var dialog = new CommonOpenFileDialog
             {
-                IsFolderPicker = true
+                IsFolderPicker = true,
+                InitialDirectory = GetDefaultFileName(ScanFolderTextBox.Text)
             };
             if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
             {
@@ -132,15 +134,22 @@ namespace ListFileNamer
         // Созранить сканы с новыми именами в папку.
         private void SaveScanButton_Click(object sender, RoutedEventArgs e)
         {
-            var destinationPath = ProjectProperties.SaveResultPath;
-            CollectFilesService filesService = new CollectFilesService();
-            filesService.CollectFiles(MatchingResultModels, destinationPath);
+            CollectFilesService collectService = new CollectFilesService();
+            collectService.CollectFiles(MatchingResultModels, ProjectProperties.SaveResultPath);
         }
 
         // Диалог выбора папки для сохранения сканов.
-        private void SelectScanButton_Click(object sender, RoutedEventArgs e)
+        private void SelectSaveScanFolderButton_Click(object sender, RoutedEventArgs e)
         {
-
+            var dialog = new CommonOpenFileDialog
+            {
+                IsFolderPicker = true,
+                InitialDirectory = GetDefaultFileName(ProjectProperties.SaveResultPath)
+            };
+            if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
+            {
+                ProjectProperties.SaveResultPath = dialog.FileName;
+            }
         }
 
         // Сохранить проект.
@@ -151,26 +160,62 @@ namespace ListFileNamer
 
         // Сохранить проект как.
         private async void SaveAsProject_Click(object sender, RoutedEventArgs e)
-        {
-            await WorkProjectService.SaveAsAsync(MatchingResultModels, ProjectProperties, "project1.lfn");
+        {            
+            var saveFile = new SaveFileDialog()
+            {
+                InitialDirectory = GetDefaultFileName(ProjectProperties.ProjectFilePath),
+                Filter = "Файл проекта List file namer (*.lfn)|*.lfn",
+                FileName = Path.GetFileName(ProjectProperties.ProjectFilePath)
+            };
+            if (saveFile.ShowDialog() == true)
+            {
+                ProjectProperties.ProjectFilePath = saveFile.FileName;
+                await WorkProjectService.SaveAsAsync(MatchingResultModels, ProjectProperties);
+            }
         }
 
         // Открыть проект.
         private void OpenProject_Click(object sender, RoutedEventArgs e)
         {
-            var project = WorkProjectService.Open("project1.lfn");
+            var folderPath = GetDefaultFileName(ProjectProperties.ProjectFilePath);
+            var project = WorkProjectService.Open(folderPath);
+            if (project != null)
+            {
+                var matchingResults = project.MatchingResults.Adapt<IEnumerable<MatchingResultViewModel>>();
+                ProjectProperties = project.ProjectProperties.Adapt<ProjectPropertiesViewModel>();
 
-            var matchingResults = project.MatchingResults.Adapt<IEnumerable<MatchingResultViewModel>>();
-            SetMatchingResult(matchingResults);
-
-            ProjectProperties = project.ServiceProperties.Adapt<ProjectPropertiesViewModel>();
+                SetMatchingResult(matchingResults);
+            }
         }
 
+        /// <summary>
+        /// Установить результат сравнения файлов.
+        /// </summary>
+        /// <param name="matchingResults"></param>
         private void SetMatchingResult(IEnumerable<MatchingResultViewModel> matchingResults)
         {
             MatchingResultModels = new ObservableCollection<MatchingResultViewModel>(matchingResults);
             DocListDG.ItemsSource = MatchingResultModels;
             RowProperties.DataContext = MatchingResultModels;
+            SaveScanTextBox.DataContext = ProjectProperties;
+        }
+
+        /// <summary>
+        /// Получить путь к файлу/папке по умолчанию.
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <returns></returns>
+        private string GetDefaultFileName(string fileName)
+        {
+            if (!string.IsNullOrEmpty(fileName) && Uri.TryCreate(fileName, UriKind.Absolute, out _))            
+                return Path.GetDirectoryName(fileName);            
+            else            
+                return ProjectProperties.FindScanServicePath;            
+        }
+
+        private void DocListDG_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+
         }
     }
 }

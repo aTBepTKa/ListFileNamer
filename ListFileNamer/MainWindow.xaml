@@ -8,7 +8,7 @@
         mc:Ignorable="d"
         Title="ListFileNamer" Height="600" Width="1200" WindowStartupLocation="CenterScreen" WindowState="Maximized">
 
-    <Window.Resources>
+    <Window.Resources>         
         <Style x:Key="TextWrapping">
             <Setter Property="TextBlock.TextWrapping" Value="Wrap"/>
         </Style>
@@ -17,7 +17,7 @@
             <Setter Property="Padding" Value="5,3,5,3"/>
         </Style>
         <Style x:Key="ToolBarButton" TargetType="Button">
-            <Setter Property="BorderBrush" Value="Black"/>            
+            <Setter Property="BorderBrush" Value="Black"/>
         </Style>
         <converters:FileNameConverter x:Key="fileNameConverter"/>
     </Window.Resources>
@@ -43,8 +43,8 @@
                 <!--<Button x:Name="FindScanButton" Content="Найти сканы" Click="FindScanButton_Click"/>-->
                 <Separator/>
                 <Label FontStyle="Italic">Сохранить в:</Label>
-                <TextBox x:Name="SaveScanTextBox" Width="200"/>
-                <Button x:Name="SelectScanButton" Content="Выбрать" Click="SelectScanButton_Click"/>
+                <TextBox x:Name="SaveScanTextBox" Width="200" Text="{Binding SaveResultPath}"/>
+                <Button x:Name="SelectSaveScanFolderButton" Content="Выбрать" Click="SelectSaveScanFolderButton_Click"/>
                 <Button x:Name="SaveScanButton" Content="Сохранить сканы" Click="SaveScanButton_Click"/>
             </ToolBar>
         </ToolBarPanel>
@@ -56,12 +56,12 @@
                         IsSynchronizedWithCurrentItem="True"
                         SelectionMode="Single" Grid.Row="1">
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Id" Binding="{Binding Path=Id}" Width="20"/>
-                <DataGridTextColumn Header="Папка" Binding="{Binding Path=FindFolder}" ElementStyle="{StaticResource TextWrapping}" Width="200">
+                <DataGridTextColumn Header="Id" Binding="{Binding Id}" Width="30" IsReadOnly="True"/>
+                <DataGridTextColumn Header="Папка" Binding="{Binding FindFolder}" ElementStyle="{StaticResource TextWrapping}" Width="200" IsReadOnly="True">
                     <DataGridTextColumn.CellStyle>
                         <Style TargetType="DataGridCell">
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding Path=FindFolderIsExist}" Value="False">
+                                <DataTrigger Binding="{Binding FindFolderIsExist}" Value="False">
                                     <Setter Property="Background" Value="Tomato"/>
                                     <Setter Property="ToolTip" Value="Папка не найдена"/>
                                 </DataTrigger>
@@ -69,11 +69,12 @@
                         </Style>
                     </DataGridTextColumn.CellStyle>
                 </DataGridTextColumn>
-                <DataGridTextColumn Header="Стр." Binding="{Binding Path=PageNumber}" Width="40"/>
-                <DataGridTextColumn Header="Наименование документа" Binding="{Binding Path=DocName}" ElementStyle="{StaticResource TextWrapping}" Width="200"/>
-                <DataGridTextColumn Header="Номер документа" Binding="{Binding Path=DocNumber}" ElementStyle="{StaticResource TextWrapping}" Width="130"/>
-                <DataGridTextColumn Header="Имя файла" Binding="{Binding Path=ScanFileName, Converter={StaticResource fileNameConverter}}" ElementStyle="{StaticResource TextWrapping}" Width="200"/>
-                <DataGridTextColumn Header="Новое имя файла" Binding="{Binding Path=NewFileName}" ElementStyle="{StaticResource TextWrapping}" Width="150"/>
+                <DataGridTextColumn Header="Стр." Binding="{Binding PageNumber}" Width="40" IsReadOnly="True"/>
+                <DataGridTextColumn Header="Наименование документа" Binding="{Binding DocName}" ElementStyle="{StaticResource TextWrapping}" Width="200" IsReadOnly="True"/>
+                <DataGridTextColumn Header="Номер д-та" Binding="{Binding DocNumber}" ElementStyle="{StaticResource TextWrapping}" Width="80" IsReadOnly="True"/>
+                <DataGridTextColumn Header="Имя файла" Binding="{Binding Path=ScanFileName, Converter={StaticResource fileNameConverter}}" ElementStyle="{StaticResource TextWrapping}" Width="100" IsReadOnly="True"/>
+                <DataGridTextColumn x:Name="NewDocNameTextBox" Header="Новое имя д-та" Binding="{Binding NewDocName}" ElementStyle="{StaticResource TextWrapping}" Width="100"/>
+                <DataGridTextColumn Header="Новое имя файла" Binding="{Binding NewFileName}" ElementStyle="{StaticResource TextWrapping}" Width="110"/>
             </DataGrid.Columns>
 
             <DataGrid.RowStyle>
@@ -132,7 +133,7 @@
                 <StackPanel>
                     <Label>Папка со сканами:</Label>
                     <DockPanel LastChildFill="True">
-                        <Button x:Name="SetScanFolderTextBox" DockPanel.Dock="Right" Click="SetScanFolderTextBox_Click" Margin="5,0,0,0">Выбрать</Button>
+                        <Button x:Name="SelectScanFolderButton" DockPanel.Dock="Right" Click="SelectScanFolderButton_Click" Margin="5,0,0,0">Выбрать</Button>
                         <TextBox x:Name="ScanFolderTextBox" Text="{Binding Path=FindFolder, Mode=OneWay, UpdateSourceTrigger=Explicit}" TextWrapping="Wrap"/>
                     </DockPanel>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">

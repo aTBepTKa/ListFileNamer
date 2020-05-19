@@ -18,6 +18,7 @@ namespace ListFileNamer.Models
         private string findFolder;
         private bool findFolderIsExist;
         private IEnumerable<string> scanFileNameVariants;
+        private string newDocName;
 
         /// <summary>
         /// Id документа из перечня.
@@ -83,6 +84,15 @@ namespace ListFileNamer.Models
         }
 
         /// <summary>
+        /// Новое наименование документа.
+        /// </summary>
+        public string NewDocName
+        {
+            get => newDocName;
+            set => SetField(ref newDocName, value, "NewDocName");
+        }
+
+        /// <summary>
         /// Новое имя файла.
         /// </summary>
         public string NewFileName
@@ -97,13 +107,14 @@ namespace ListFileNamer.Models
         public IEnumerable<string> ScanFileNameVariants
         {
             get => scanFileNameVariants;
-            set => SetField(ref scanFileNameVariants, value, "scanFileNameVariants");
+            set => SetField(ref scanFileNameVariants, value, "ScanFileNameVariants");
         }
 
         /// <summary>
         /// Точное совпадение при поиске.
         /// </summary>
         public bool IsExactMatch { get; set; }
+
 
         private bool SetField<T>(ref T field, T value, string propertyName)
         {

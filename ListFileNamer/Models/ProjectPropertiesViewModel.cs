@@ -9,7 +9,7 @@ namespace ListFileNamer.Models
     /// <summary>
     /// Настройки проекта.
     /// </summary>
-    class ProjectPropertiesViewModel : IProjectProperties
+    public class ProjectPropertiesViewModel : IProjectProperties, INotifyPropertyChanged
     {
         private string saveResultPath;
 
@@ -17,7 +17,8 @@ namespace ListFileNamer.Models
         public int StartExcelRow { get; set; }
         public int EndExcelRow { get; set; }
         public string FindScanServicePath { get; set; }
-        public string SaveResultPath { get => saveResultPath; set => saveResultPath = value; }
+        public string SaveResultPath { get => saveResultPath; set => SetField(ref saveResultPath, value, "SaveResultPath"); }
+        public string ProjectFilePath { get; set; }
 
         private bool SetField<T>(ref T field, T value, string propertyName)
         {

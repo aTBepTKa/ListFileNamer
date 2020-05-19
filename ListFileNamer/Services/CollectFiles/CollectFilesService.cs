@@ -38,19 +38,30 @@ namespace ListFileNamer.Services.CollectFiles
         /// </summary>
         public void CollectFiles(IEnumerable<IMatchingResult> matchingResults, string destinationPath)
         {
-            if (!string.IsNullOrEmpty(destinationPath) && !Uri.TryCreate(destinationPath, UriKind.Absolute, out _))
+            if (string.IsNullOrEmpty(destinationPath) && !Uri.TryCreate(destinationPath, UriKind.Absolute, out _))
             {
                 MessageBox.Show("Не корректный путь папки сохранения.", "Ошибка при задании пути", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
-
-            foreach (var file in matchingResults)
+            if (matchingResults == null)
             {
-                var filePath = file.ScanFileName;
-                if (string.IsNullOrEmpty(filePath))
-                    continue;
-                var newFilePath = Path.Combine(destinationPath, file.NewFileName);
-                File.Copy(filePath, newFilePath);
+                MessageBox.Show("Отсутствует таблица исходных данных", "Ошибка при сохранении файлов", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+            try
+            {
+                foreach (var file in matchingResults)
+                {
+                    var filePath = file.ScanFileName;
+                    if (string.IsNullOrEmpty(filePath))
+                        continue;
+                    var newFilePath = Path.Combine(destinationPath, file.NewFileName);
+                    File.Copy(filePath, newFilePath, true);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка при сохранении файла: {ex.Message}", "Ошибка при сохранении файлов", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
     }

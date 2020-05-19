@@ -13,6 +13,7 @@ namespace ListFileNamer.Models.Interfaces
         bool IsAct { get; set; }
         bool IsExactMatch { get; set; }
         bool IsPrimary { get; set; }
+        string NewDocName { get; set; }
         string NewFileName { get; set; }
         int PageNumber { get; set; }
         string ScanFileName { get; set; }

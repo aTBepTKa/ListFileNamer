@@ -17,6 +17,7 @@ namespace ListFileNamer.Services.WorkProject
         public bool IsAct { get; set; }
         public bool IsExactMatch { get; set; }
         public bool IsPrimary { get; set; }
+        public string NewDocName { get; set; }
         public string NewFileName { get; set; }
         public int PageNumber { get; set; }
         public string ScanFileName { get; set; }

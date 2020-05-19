@@ -8,6 +8,7 @@ using System.Windows;
 using System.Threading.Tasks;
 using System.IO.Compression;
 using Mapster;
+using Microsoft.Win32;
 
 namespace ListFileNamer.Services.WorkProject
 {
@@ -19,7 +20,7 @@ namespace ListFileNamer.Services.WorkProject
         /// <summary>
         /// Сохранить проект.
         /// </summary>
-        public static void Save(IProjectProperties serviceProperties, IEnumerable<IMatchingResult> matchingResult)
+        public static void Save(IProjectProperties projectProperties, IEnumerable<IMatchingResult> matchingResult)
         {
 
         }
@@ -27,26 +28,25 @@ namespace ListFileNamer.Services.WorkProject
         /// <summary>
         /// Сохранить проект как.
         /// </summary>
-        public static async Task SaveAsAsync(IEnumerable<MatchingResultViewModel> matchingResult, IProjectProperties serviceProperties, string path)
+        public static async Task SaveAsAsync(IEnumerable<IMatchingResult> matchingResult, IProjectProperties projectProperties)
         {
             try
             {
                 var fileModel = new WorkProjectFileModel()
                 {
                     MatchingResults = matchingResult.Adapt<IEnumerable<MatchingResultFile>>(),
-                    ServiceProperties = serviceProperties.Adapt<ProjectPropertiesFile>()
+                    ProjectProperties = projectProperties.Adapt<ProjectPropertiesFile>()
                 };
                 // Поток записи в файл
-                using var fileStream = new FileStream(path, FileMode.OpenOrCreate);
+                using var fileStream = new FileStream(projectProperties.ProjectFilePath, FileMode.OpenOrCreate);
                 using var zipStream = new GZipStream(fileStream, CompressionLevel.Optimal);
 
-                await JsonSerializer.SerializeAsync(zipStream, fileModel);
+                await JsonSerializer.SerializeAsync(zipStream, fileModel);                
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"Ошибка при записи в файл: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
-
         }
 
         /// <summary>
@@ -54,10 +54,21 @@ namespace ListFileNamer.Services.WorkProject
         /// </summary>
         public static WorkProjectFileModel Open(string path)
         {
+            string fileName;
+            var openFile = new OpenFileDialog()
+            {
+                InitialDirectory = path,
+                Filter = "Файл проекта List file namer (*.lfn)|*.lfn"
+            };
+            if (openFile.ShowDialog() == true)
+                fileName = openFile.FileName;
+            else
+                return null;
+
             WorkProjectFileModel workProject;
             try
             {
-                using var fileStream = new FileStream(path, FileMode.OpenOrCreate);
+                using var fileStream = new FileStream(fileName, FileMode.OpenOrCreate);
                 var zipStream = new GZipStream(fileStream, CompressionMode.Decompress);
                 var streamReader = new StreamReader(zipStream);
                 var jsonText = streamReader.ReadToEnd();
