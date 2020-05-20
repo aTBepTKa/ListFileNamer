@@ -20,9 +20,9 @@ namespace ListFileNamer.Services.WorkProject
         /// <summary>
         /// Сохранить проект.
         /// </summary>
-        public static void Save(IProjectProperties projectProperties, IEnumerable<IMatchingResult> matchingResult)
+        public static async Task SaveAsync(IEnumerable<IMatchingResult> matchingResult, IProjectProperties projectProperties)
         {
-
+            await SaveAsAsync(matchingResult, projectProperties);
         }
 
         /// <summary>

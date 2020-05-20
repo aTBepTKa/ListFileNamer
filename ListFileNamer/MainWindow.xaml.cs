@@ -54,7 +54,7 @@ namespace ListFileNamer
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
             // Назначить DataContext.
-            SaveScanTextBox.DataContext = ProjectProperties;
+            SaveScanTextBox.DataContext = ProjectProperties;            
         }
 
         /// <summary>
@@ -95,8 +95,6 @@ namespace ListFileNamer
                 var item = (MatchingResultViewModel)DocListDG.SelectedItem;
                 item.ScanFileName = filePath;
                 item.NewDocName = Path.GetFileNameWithoutExtension(filePath);
-                var extension = Path.GetExtension(filePath);
-                item.NewFileName = $"Стр. {item.PageNumber}. {item.NewDocName}{extension}";
             }
         }
 
@@ -153,9 +151,9 @@ namespace ListFileNamer
         }
 
         // Сохранить проект.
-        private void SaveProject_Click(object sender, RoutedEventArgs e)
+        private async void SaveProject_Click(object sender, RoutedEventArgs e)
         {
-
+            await WorkProjectService.SaveAsync(MatchingResultModels, ProjectProperties);
         }
 
         // Сохранить проект как.
@@ -211,11 +209,6 @@ namespace ListFileNamer
                 return Path.GetDirectoryName(fileName);            
             else            
                 return ProjectProperties.FindScanServicePath;            
-        }
-
-        private void DocListDG_PreviewKeyDown(object sender, KeyEventArgs e)
-        {
-
         }
     }
 }

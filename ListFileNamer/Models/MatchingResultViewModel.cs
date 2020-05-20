@@ -80,8 +80,17 @@ namespace ListFileNamer.Models
         public string ScanFileName
         {
             get => scanFileName;
-            set => SetField(ref scanFileName, value, "ScanFileName");
+            set
+            {
+                SetField(ref scanFileName, value, "ScanFileName");
+                FileExtension = Path.GetExtension(value);
+            }
         }
+
+        /// <summary>
+        /// Расширение файла.
+        /// </summary>
+        private string FileExtension { get; set; }
 
         /// <summary>
         /// Новое наименование документа.
@@ -89,7 +98,11 @@ namespace ListFileNamer.Models
         public string NewDocName
         {
             get => newDocName;
-            set => SetField(ref newDocName, value, "NewDocName");
+            set
+            {
+                SetField(ref newDocName, value, "NewDocName");
+                NewFileName = $"Стр. {PageNumber}. {value}{FileExtension}";
+            }
         }
 
         /// <summary>
@@ -114,7 +127,6 @@ namespace ListFileNamer.Models
         /// Точное совпадение при поиске.
         /// </summary>
         public bool IsExactMatch { get; set; }
-
 
         private bool SetField<T>(ref T field, T value, string propertyName)
         {
