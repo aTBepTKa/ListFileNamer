@@ -64,8 +64,7 @@ namespace ListFileNamer
             if (filePath != null)
             {
                 var item = (MatchingResultViewModel)DocListDG.SelectedItem;
-                item.ScanFileName = filePath;
-                item.NewDocName = Path.GetFileNameWithoutExtension(filePath);
+                FindScanService.SetScanFileName(item, filePath);
             }
         }
 

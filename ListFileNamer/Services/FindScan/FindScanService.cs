@@ -1,4 +1,5 @@
 ﻿using ListFileNamer.Models;
+using ListFileNamer.Models.Interfaces;
 using ListFileNamer.Services.Excel;
 using Mapster;
 using System.Collections.Generic;
@@ -72,6 +73,15 @@ namespace ListFileNamer.Services.FindScan
             }
             return true;
         }
+
+        /// <summary>
+        /// Установить новое имя файла.
+        /// </summary>
+        /// <param name="matchingResult">Модель данных.</param>
+        /// <param name="scanFilePath">Имя файла.</param>
+        public static void SetScanFileName(IMatchingResult matchingResult, string scanFilePath) =>
+            FileNameComparer.SetScanFileName(matchingResult, scanFilePath);
+
 
         /// <summary>
         /// Установить папку поиска скана.

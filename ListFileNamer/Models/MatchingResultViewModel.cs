@@ -98,11 +98,7 @@ namespace ListFileNamer.Models
         public string NewDocName
         {
             get => newDocName;
-            set
-            {
-                SetField(ref newDocName, value, "NewDocName");
-                NewFileName = $"Стр. {PageNumber}. {value}{FileExtension}";
-            }
+            set => SetField(ref newDocName, value, "NewDocName");
         }
 
         /// <summary>
@@ -127,6 +123,7 @@ namespace ListFileNamer.Models
         /// Точное совпадение при поиске.
         /// </summary>
         public bool IsExactMatch { get; set; }
+        string IMatchingResult.FileExtension { get; set; }
 
         private bool SetField<T>(ref T field, T value, string propertyName)
         {

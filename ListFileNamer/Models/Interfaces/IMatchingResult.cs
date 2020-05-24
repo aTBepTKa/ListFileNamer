@@ -17,6 +17,7 @@ namespace ListFileNamer.Models.Interfaces
         string NewFileName { get; set; }
         int PageNumber { get; set; }
         string ScanFileName { get; set; }
+        string FileExtension { get; set; }
         IEnumerable<string> ScanFileNameVariants { get; set; }
     }
 }

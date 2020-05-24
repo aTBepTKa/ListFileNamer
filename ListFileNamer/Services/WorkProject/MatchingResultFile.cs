@@ -22,5 +22,6 @@ namespace ListFileNamer.Services.WorkProject
         public int PageNumber { get; set; }
         public string ScanFileName { get; set; }
         public IEnumerable<string> ScanFileNameVariants { get; set; }
+        public string FileExtension { get; set; }
     }
 }

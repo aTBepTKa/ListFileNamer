@@ -1,10 +1,14 @@
-﻿using System;
+﻿using ListFileNamer.Models.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace ListFileNamer.Services.FindScan
 {
-    public class FindModel
+    /// <summary>
+    /// Модель для поиска файлов и папок.
+    /// </summary>
+    public class FindModel : IMatchingResult
     {
         /// <summary>
         /// Id документа из перечня.
@@ -60,6 +64,16 @@ namespace ListFileNamer.Services.FindScan
         public string ScanFileName { get; set; }
 
         /// <summary>
+        /// Новое наименование документа.
+        /// </summary>
+        public string NewDocName { get; set; }
+
+        /// <summary>
+        /// Новое имя файла.
+        /// </summary>
+        public string NewFileName { get; set; }
+
+        /// <summary>
         /// Возможные варианты имени файла.
         /// </summary>
         public IEnumerable<string> ScanFileNameVariants { get; set; }
@@ -68,5 +82,6 @@ namespace ListFileNamer.Services.FindScan
         /// Точное совпадение при поиске.
         /// </summary>
         public bool IsExactMatch { get; set; }
+        public string FileExtension { get; set; }
     }
 }
