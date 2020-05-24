@@ -13,5 +13,10 @@ namespace ListFileNamer.Services.WorkProject
         /// Путь к файлу проекта.
         /// </summary>
         string ProjectFilePath { get; set; }
+
+        /// <summary>
+        /// Проект является новым, путь для сохранения не назнчаен.
+        /// </summary>
+        bool IsNewProject { get; set; }
     }
 }

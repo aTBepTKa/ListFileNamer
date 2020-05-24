@@ -11,7 +11,7 @@
     <Window.Resources>
         <System:Double x:Key="LabelWidth1">100</System:Double>
         <System:Double x:Key="TextBoxWidth1">200</System:Double>
-        <Thickness x:Key="EditBoxMargin" Left="110" Top="0" Right="77" Bottom="0"/>
+        <Thickness x:Key="EditBoxMargin" Left="110" Top="0" Right="30" Bottom="0"/>
     </Window.Resources>
     <Grid>
         <StackPanel HorizontalAlignment="Stretch" Orientation="Vertical" VerticalAlignment="Top">
@@ -19,13 +19,14 @@
                 <StackPanel>
                     <Grid>
                         <Label Content="Путь к перечню" Height="26" Width="{DynamicResource LabelWidth1}" HorizontalAlignment="Left"/>
-                        <TextBox x:Name="DocListPathTextBox" Height="20" Padding="0,0,0,0" Margin="{DynamicResource EditBoxMargin}" MinWidth="200"/>
-                        <Button x:Name="DocListPathButton" Content="Выбрать" Click="DocListPathButton_Click" Width="57" Height="20" HorizontalAlignment="Right" Margin="10,0,10,0"/>
+                        <TextBox x:Name="DocListPathTextBox" Height="20" Margin="{DynamicResource EditBoxMargin}" MinWidth="200"/>
+                        <Button x:Name="DocListPathButton" ToolTip="Выбрать" Click="DocListPathButton_Click" Height="20" HorizontalAlignment="Right">
+                            <Image Source="\data\images\open-folder-black-and-white-variant.png"/>
+                        </Button>
                     </Grid>
                     <StackPanel Orientation="Horizontal">
                         <Label Content="Первая строка данных:" Height="26" HorizontalAlignment="Left"/>
-                        <TextBox x:Name="FirstRowTextBox" Height="20" Width="38" PreviewTextInput="FirstRowTextBox_PreviewTextInput"></TextBox>    
-                        
+                        <TextBox x:Name="FirstRowTextBox" Height="20" Width="38" PreviewTextInput="FirstRowTextBox_PreviewTextInput"></TextBox>
                         <Label Content="Последняя строка данных:" Height="26" HorizontalAlignment="Left" Margin="10,0,0,0"/>
                         <TextBox x:Name="LastRowTextBox" Height="20" Width="38" PreviewTextInput="LastRowTextBox_PreviewTextInput"></TextBox>
                     </StackPanel>
@@ -36,7 +37,9 @@
             <Grid>
                 <Label Content="Путь к сканам" Height="26" Width="{DynamicResource LabelWidth1}" HorizontalAlignment="Left"/>
                 <TextBox x:Name="ScanPathTextBox" Height="20" MinWidth="200" Margin="{DynamicResource EditBoxMargin}"/>
-                <Button x:Name="ScanPathPathButton" Content="Выбрать" Click="ScanPathPathButton_Click" Width="57" Height="20" HorizontalAlignment="Right" Margin="10,0,10,0"/>
+                <Button x:Name="ScanPathPathButton" ToolTip="Выбрать" Click="ScanPathPathButton_Click" Height="20" HorizontalAlignment="Right" Margin="0,0,5,0">
+                    <Image Source="\data\images\open-folder-black-and-white-variant.png"/>
+                </Button>
             </Grid>
         </StackPanel>
 

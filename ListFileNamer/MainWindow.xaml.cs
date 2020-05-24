@@ -2,25 +2,15 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Configuration;
 using System.IO;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using ListFileNamer.Services.FindScan;
 using ListFileNamer.Services.Excel;
 using ListFileNamer.Services.WorkProject;
 using Mapster;
-using ListFileNamer.Models.Interfaces;
 using ListFileNamer.Services.CollectFiles;
 using Microsoft.Win32;
 
@@ -54,7 +44,8 @@ namespace ListFileNamer
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
             // Назначить DataContext.
-            SaveScanTextBox.DataContext = ProjectProperties;            
+            SaveScanTextBox.DataContext = ProjectProperties;
+            DataContext = ProjectProperties;
         }
 
         /// <summary>
@@ -79,14 +70,26 @@ namespace ListFileNamer
         // Назначить сканы для записей в перечне.
         private void FindScanButton_Click(object sender, RoutedEventArgs e)
         {
-            ExcelService = new ExcelService(ProjectProperties);
-            var excelList = ExcelService.GetList();
-            FindScanService = new FindScanService(ProjectProperties);
-            var result = FindScanService.GetMatchingResultFromExcel(excelList).Adapt<IEnumerable<MatchingResultViewModel>>();
-            SetMatchingResult(result);
+            try
+            {
+                ExcelService = new ExcelService(ProjectProperties);
+                var excelList = ExcelService.GetList();
+                FindScanService = new FindScanService(ProjectProperties);
+                var result = FindScanService.GetMatchingResultFromExcel(excelList).Adapt<IEnumerable<MatchingResultViewModel>>();
+                SetMatchingResult(result);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка при загрузке данных {ex.Message}");
+            }
         }
 
         // Событие изменения выделенной записи в списке файлов.
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ListBoxRowTemplate_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             string filePath = (string)(sender as ListBox).SelectedItem;
@@ -153,12 +156,15 @@ namespace ListFileNamer
         // Сохранить проект.
         private async void SaveProject_Click(object sender, RoutedEventArgs e)
         {
-            await WorkProjectService.SaveAsync(MatchingResultModels, ProjectProperties);
+            if (string.IsNullOrEmpty(ProjectProperties.ProjectFilePath))
+                SaveAsProject_Click(sender, e);
+            else
+                await WorkProjectService.SaveAsync(MatchingResultModels, ProjectProperties);
         }
 
         // Сохранить проект как.
         private async void SaveAsProject_Click(object sender, RoutedEventArgs e)
-        {            
+        {
             var saveFile = new SaveFileDialog()
             {
                 InitialDirectory = GetDefaultFileName(ProjectProperties.ProjectFilePath),
@@ -196,6 +202,8 @@ namespace ListFileNamer
             DocListDG.ItemsSource = MatchingResultModels;
             RowProperties.DataContext = MatchingResultModels;
             SaveScanTextBox.DataContext = ProjectProperties;
+
+            SetNewWindowName(ProjectProperties.ProjectFilePath);
         }
 
         /// <summary>
@@ -205,10 +213,21 @@ namespace ListFileNamer
         /// <returns></returns>
         private string GetDefaultFileName(string fileName)
         {
-            if (!string.IsNullOrEmpty(fileName) && Uri.TryCreate(fileName, UriKind.Absolute, out _))            
-                return Path.GetDirectoryName(fileName);            
-            else            
-                return ProjectProperties.FindScanServicePath;            
+            if (!string.IsNullOrEmpty(fileName) && Uri.TryCreate(fileName, UriKind.Absolute, out _))
+                return Path.GetDirectoryName(fileName);
+            else
+                return ProjectProperties.FindScanServicePath;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="windowName"></param>
+        private void SetNewWindowName(string windowName)
+        {
+            var programName = "ListFileNamer";
+            if (!string.IsNullOrEmpty(windowName))
+                Title = windowName + " - " + programName;
         }
     }
 }

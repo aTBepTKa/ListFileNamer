@@ -7,6 +7,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Data\Images\document-empty.png" />
+    <None Remove="Data\Images\floppy-disk-digital-data-storage-or-save-interface-symbol.png" />
+    <None Remove="Data\Images\floppy-diskette-with-pen.png" />
+    <None Remove="Data\Images\floppy-disks-pair.png" />
+    <None Remove="Data\Images\open-folder-black-and-white-variant.png" />
+    <None Remove="Data\Images\open-folder-with-document.png" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Folder Include="App_data\" />
   </ItemGroup>
 
@@ -19,8 +28,26 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="Data\Images\document-empty.png" />
+    <Resource Include="Data\Images\floppy-disk-digital-data-storage-or-save-interface-symbol.png" />
+    <Resource Include="Data\Images\floppy-diskette-with-pen.png" />
+    <Resource Include="Data\Images\floppy-disks-pair.png" />
+    <Resource Include="Data\Images\open-folder-black-and-white-variant.png" />
+    <Resource Include="Data\Images\open-folder-with-document.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
     <EmbeddedResource Update="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
 

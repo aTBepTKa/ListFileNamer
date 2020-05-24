@@ -5,10 +5,10 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ListFileNamer"
         xmlns:converters="clr-namespace:ListFileNamer.Converters"
-        mc:Ignorable="d"
-        Title="ListFileNamer" Height="600" Width="1200" WindowStartupLocation="CenterScreen" WindowState="Maximized">
-
-    <Window.Resources>         
+        mc:Ignorable="d"        
+        Title="List File Namer" Height="600" Width="1200" WindowStartupLocation="CenterScreen" WindowState="Maximized"
+    xmlns:System="clr-namespace:System;assembly=System.Runtime">
+    <Window.Resources>
         <Style x:Key="TextWrapping">
             <Setter Property="TextBlock.TextWrapping" Value="Wrap"/>
         </Style>
@@ -20,12 +20,15 @@
             <Setter Property="BorderBrush" Value="Black"/>
         </Style>
         <converters:FileNameConverter x:Key="fileNameConverter"/>
+        <converters:BooleanConverter x:Key="booleanConverter"/>
+        <System:Double x:Key="ToolbarButtonWidth">32</System:Double>
     </Window.Resources>
 
     <Grid ScrollViewer.CanContentScroll="True">
         <Grid.RowDefinitions>
-            <RowDefinition Height="30"/>
-            <RowDefinition/>
+            <RowDefinition Height="32"/>
+            <RowDefinition Height="65*"/>
+            <RowDefinition Height="4*"/>
         </Grid.RowDefinitions>
 
         <Grid.ColumnDefinitions>
@@ -35,17 +38,30 @@
 
         <ToolBarPanel Grid.ColumnSpan="2">
             <ToolBar>
-                <Button x:Name="SaveProject" Content="Сохранить" Click="SaveProject_Click"/>
-                <Button x:Name="SaveAsProject" Content="Сохранить как" Click="SaveAsProject_Click"/>
-                <Button x:Name="OpenProject" Content="Открыть" Click="OpenProject_Click"/>
+                <Button x:Name="LoadButton" ToolTip="Создать новый проект" Click="LoadButton_Click" Width="{DynamicResource ToolbarButtonWidth}">
+                    <Image Source="\data\images\document-empty.png"/>
+                </Button>
                 <Separator/>
-                <Button x:Name="LoadButton" Content="Импортировать перечень" Click="LoadButton_Click"/>
+                <Button x:Name="SaveProject" ToolTip="Сохранить" Click="SaveProject_Click" Width="{DynamicResource ToolbarButtonWidth}">
+                    <Image Source="\data\images\floppy-disk-digital-data-storage-or-save-interface-symbol.png"/>
+                </Button>
+                <Button x:Name="SaveAsProject" ToolTip="Сохранить как" Click="SaveAsProject_Click" Width="{DynamicResource ToolbarButtonWidth}">
+                    <Image Source="\data\images\floppy-diskette-with-pen.png"/>
+                </Button>
+                <Button x:Name="OpenProject" ToolTip="Открыть проект" Click="OpenProject_Click" Width="{DynamicResource ToolbarButtonWidth}">
+                    <Image Source="\data\images\open-folder-with-document.png"/>
+                </Button>
                 <!--<Button x:Name="FindScanButton" Content="Найти сканы" Click="FindScanButton_Click"/>-->
                 <Separator/>
                 <Label FontStyle="Italic">Сохранить в:</Label>
                 <TextBox x:Name="SaveScanTextBox" Width="200" Text="{Binding SaveResultPath}"/>
-                <Button x:Name="SelectSaveScanFolderButton" Content="Выбрать" Click="SelectSaveScanFolderButton_Click"/>
-                <Button x:Name="SaveScanButton" Content="Сохранить сканы" Click="SaveScanButton_Click"/>
+                <Button x:Name="SelectSaveScanFolderButton" ToolTip="Выбрать путь для сохранения сканов" Click="SelectSaveScanFolderButton_Click" Width="{DynamicResource ToolbarButtonWidth}">
+                    <Image Source="\data\images\open-folder-black-and-white-variant.png"/>
+                </Button>
+                <Separator/>
+                <Button x:Name="SaveScanButton" ToolTip="Сохранить сканы" Click="SaveScanButton_Click" Width="{DynamicResource ToolbarButtonWidth}">
+                    <Image Source="\data\images\floppy-disks-pair.png"/>
+                </Button>
             </ToolBar>
         </ToolBarPanel>
 
@@ -123,17 +139,18 @@
                       Grid.Row="1"
                       Grid.RowSpan="2"
                       Background="Gray"
-                      Width="3"
-                      VerticalAlignment="Stretch"/>
+                      Width="3"/>
 
-        <DockPanel Name="RowProperties" Grid.Column="1" Grid.Row="1">
+        <DockPanel Name="RowProperties" Grid.Column="1" Grid.Row="1" Grid.RowSpan="3">
             <Label DockPanel.Dock="Top" Background="LightGray" FontWeight="Bold">Параметры записи</Label>
 
             <GroupBox Header="Параметры пути" DockPanel.Dock="Top">
                 <StackPanel>
                     <Label>Папка со сканами:</Label>
                     <DockPanel LastChildFill="True">
-                        <Button x:Name="SelectScanFolderButton" DockPanel.Dock="Right" Click="SelectScanFolderButton_Click" Margin="5,0,0,0">Выбрать</Button>
+                        <Button x:Name="SelectScanFolderButton" DockPanel.Dock="Right" Click="SelectScanFolderButton_Click" Margin="5,0,0,0" Width="{DynamicResource ToolbarButtonWidth}">
+                            <Image Source="\data\images\open-folder-black-and-white-variant.png"/>
+                        </Button>
                         <TextBox x:Name="ScanFolderTextBox" Text="{Binding Path=FindFolder, Mode=OneWay, UpdateSourceTrigger=Explicit}" TextWrapping="Wrap"/>
                     </DockPanel>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
@@ -153,5 +170,8 @@
                 </ListBox>
             </GroupBox>
         </DockPanel>
+        <StatusBar Grid.Row="3" Grid.ColumnSpan="2">
+            <ProgressBar x:Name="LoadProgressBar" Width="200" Height="30" Value="0"/>
+        </StatusBar>
     </Grid>
 </Window>

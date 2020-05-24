@@ -12,13 +12,25 @@ namespace ListFileNamer.Models
     public class ProjectPropertiesViewModel : IProjectProperties, INotifyPropertyChanged
     {
         private string saveResultPath;
+        private string projectFilePath;
+        private bool isNewProject = true;
+        private string windowTitle = "List File Namer";
 
         public string ExcelServicePath { get; set; }
         public int StartExcelRow { get; set; }
         public int EndExcelRow { get; set; }
         public string FindScanServicePath { get; set; }
         public string SaveResultPath { get => saveResultPath; set => SetField(ref saveResultPath, value, "SaveResultPath"); }
-        public string ProjectFilePath { get; set; }
+        public string ProjectFilePath
+        {
+            get => projectFilePath;
+            set
+            {
+                projectFilePath = value;
+                IsNewProject = false;
+            }
+        }
+        public bool IsNewProject { get => isNewProject; set => SetField(ref isNewProject, value, "IsNewProject"); }
 
         private bool SetField<T>(ref T field, T value, string propertyName)
         {
