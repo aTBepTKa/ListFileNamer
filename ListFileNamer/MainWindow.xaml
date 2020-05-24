@@ -28,7 +28,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="32"/>
             <RowDefinition Height="65*"/>
-            <RowDefinition Height="4*"/>
+            <RowDefinition Height="30"/>
         </Grid.RowDefinitions>
 
         <Grid.ColumnDefinitions>
@@ -38,11 +38,11 @@
 
         <ToolBarPanel Grid.ColumnSpan="2">
             <ToolBar>
-                <Button x:Name="LoadButton" ToolTip="Создать новый проект" Click="LoadButton_Click" Width="{DynamicResource ToolbarButtonWidth}">
+                <Button x:Name="LoadButton" ToolTip="Создать новый проект" Click="LoadProjectButton_Click" Width="{DynamicResource ToolbarButtonWidth}">
                     <Image Source="\data\images\document-empty.png"/>
                 </Button>
                 <Separator/>
-                <Button x:Name="SaveProject" ToolTip="Сохранить" Click="SaveProject_Click" Width="{DynamicResource ToolbarButtonWidth}">
+                <Button x:Name="SaveProjectButton" ToolTip="Сохранить" Click="SaveProjectButton_Click" Width="{DynamicResource ToolbarButtonWidth}">
                     <Image Source="\data\images\floppy-disk-digital-data-storage-or-save-interface-symbol.png"/>
                 </Button>
                 <Button x:Name="SaveAsProject" ToolTip="Сохранить как" Click="SaveAsProject_Click" Width="{DynamicResource ToolbarButtonWidth}">
@@ -54,7 +54,7 @@
                 <!--<Button x:Name="FindScanButton" Content="Найти сканы" Click="FindScanButton_Click"/>-->
                 <Separator/>
                 <Label FontStyle="Italic">Сохранить в:</Label>
-                <TextBox x:Name="SaveScanTextBox" Width="200" Text="{Binding SaveResultPath}"/>
+                <TextBox x:Name="SaveScanTextBox" ToolTip="Путь сохранения сканов для записи на диск" Width="200" Text="{Binding SaveResultPath}"/>
                 <Button x:Name="SelectSaveScanFolderButton" ToolTip="Выбрать путь для сохранения сканов" Click="SelectSaveScanFolderButton_Click" Width="{DynamicResource ToolbarButtonWidth}">
                     <Image Source="\data\images\open-folder-black-and-white-variant.png"/>
                 </Button>
@@ -141,7 +141,7 @@
                       Background="Gray"
                       Width="3"/>
 
-        <DockPanel Name="RowProperties" Grid.Column="1" Grid.Row="1" Grid.RowSpan="3">
+        <DockPanel Name="RowProperties" Grid.Column="1" Grid.Row="1" Grid.RowSpan="3" IsEnabled="False">
             <Label DockPanel.Dock="Top" Background="LightGray" FontWeight="Bold">Параметры записи</Label>
 
             <GroupBox Header="Параметры пути" DockPanel.Dock="Top">
@@ -171,7 +171,8 @@
             </GroupBox>
         </DockPanel>
         <StatusBar Grid.Row="3" Grid.ColumnSpan="2">
-            <ProgressBar x:Name="LoadProgressBar" Width="200" Height="30" Value="0"/>
+            <ProgressBar x:Name="LoadProgressBar" Width="200" Height="20" Value="0"/>
+            <Label Name="StatusLabel"></Label>
         </StatusBar>
     </Grid>
 </Window>

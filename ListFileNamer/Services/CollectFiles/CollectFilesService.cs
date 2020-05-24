@@ -3,7 +3,9 @@ using Microsoft.WindowsAPICodePack.Shell;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using System.Windows;
 
 namespace ListFileNamer.Services.CollectFiles
@@ -36,33 +38,45 @@ namespace ListFileNamer.Services.CollectFiles
         /// <summary>
         /// Скомпановать файлы сканов согласно перечню.
         /// </summary>
-        public void CollectFiles(IEnumerable<IMatchingResult> matchingResults, string destinationPath)
+        public async Task CollectFilesAsync(IEnumerable<IMatchingResult> matchingResults, string destinationPath, IProgress<double> progress)
         {
-            if (string.IsNullOrEmpty(destinationPath) && !Uri.TryCreate(destinationPath, UriKind.Absolute, out _))
+            await Task.Run(() =>
             {
-                MessageBox.Show("Не корректный путь папки сохранения.", "Ошибка при задании пути", MessageBoxButton.OK, MessageBoxImage.Error);
-                return;
-            }
-            if (matchingResults == null)
-            {
-                MessageBox.Show("Отсутствует таблица исходных данных", "Ошибка при сохранении файлов", MessageBoxButton.OK, MessageBoxImage.Error);
-                return;
-            }
-            try
-            {
-                foreach (var file in matchingResults)
+                if (string.IsNullOrEmpty(destinationPath) && !Uri.TryCreate(destinationPath, UriKind.Absolute, out _))
                 {
-                    var filePath = file.ScanFileName;
-                    if (string.IsNullOrEmpty(filePath))
-                        continue;
-                    var newFilePath = Path.Combine(destinationPath, file.NewFileName);
-                    File.Copy(filePath, newFilePath, true);
+                    MessageBox.Show("Не корректный путь папки сохранения.", "Ошибка при задании пути", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
                 }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Ошибка при сохранении файла: {ex.Message}", "Ошибка при сохранении файлов", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+                if (matchingResults == null)
+                {
+                    MessageBox.Show("Отсутствует таблица исходных данных", "Ошибка при сохранении файлов", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+                try
+                {
+                    var filesCount = matchingResults.Count();
+                    var fileNumber = 0;
+                    double completePrecent = 0;
+                    foreach (var file in matchingResults)
+                    {
+                        var filePath = file.ScanFileName;
+                        if (string.IsNullOrEmpty(filePath))
+                            continue;
+                        var newFilePath = Path.Combine(destinationPath, file.NewFileName);
+                        File.Copy(filePath, newFilePath, true);
+                        
+                        fileNumber++;
+                        completePrecent = (double)fileNumber / filesCount * 100;
+                        progress.Report(completePrecent);
+                    }
+                    return;
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Ошибка при сохранении файла: {ex.Message}", "Ошибка при сохранении файлов", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+
+            });
         }
     }
 }

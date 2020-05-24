@@ -53,40 +53,8 @@ namespace ListFileNamer
         /// </summary>
         public static ObservableCollection<MatchingResultViewModel> MatchingResultModels { get; set; }
 
-        // Назначить пути для работы с файлами.
-        private void LoadButton_Click(object sender, RoutedEventArgs e)
-        {
-            var openFileWindow = new OpenDataFileWindow(ProjectProperties);
-            if (openFileWindow.ShowDialog() == true)
-            {
-                ProjectProperties = openFileWindow.ProjectProperties;
-
-                var config = new AppConfigurationManager();
-                config.SaveProperties(ProjectProperties);
-                FindScanButton_Click(null, null);
-            }
-        }
-
-        // Назначить сканы для записей в перечне.
-        private void FindScanButton_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                ExcelService = new ExcelService(ProjectProperties);
-                var excelList = ExcelService.GetList();
-                FindScanService = new FindScanService(ProjectProperties);
-                var result = FindScanService.GetMatchingResultFromExcel(excelList).Adapt<IEnumerable<MatchingResultViewModel>>();
-                SetMatchingResult(result);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Ошибка при загрузке данных {ex.Message}");
-            }
-        }
-
-        // Событие изменения выделенной записи в списке файлов.
         /// <summary>
-        /// 
+        /// Bзменениt выделенной записи в списке файлов.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -105,8 +73,8 @@ namespace ListFileNamer
         private void SetScanRowButton_Click(object sender, RoutedEventArgs e)
         {
             var item = (MatchingResultViewModel)DocListDG.SelectedItem;
-            var path = ScanFolderTextBox.Text;
-            FindScanService.SetScanFolder(item, path);
+            var path = ScanFolderTextBox.Text;            
+            FindScanService?.SetScanFolder(item, path);
         }
 
         // Установить папку сканов для акта и всех документов.
@@ -115,7 +83,7 @@ namespace ListFileNamer
             var models = MatchingResultModels;
             var groupId = ((MatchingResultViewModel)DocListDG.SelectedItem).GroupId;
             var path = ScanFolderTextBox.Text;
-            FindScanService.SetScanFolder(models, groupId, path);
+            FindScanService?.SetScanFolder(models, groupId, path);
         }
 
         // Диалог выбора папки с исходными сканами.
@@ -132,80 +100,6 @@ namespace ListFileNamer
             }
         }
 
-        // Созранить сканы с новыми именами в папку.
-        private void SaveScanButton_Click(object sender, RoutedEventArgs e)
-        {
-            CollectFilesService collectService = new CollectFilesService();
-            collectService.CollectFiles(MatchingResultModels, ProjectProperties.SaveResultPath);
-        }
-
-        // Диалог выбора папки для сохранения сканов.
-        private void SelectSaveScanFolderButton_Click(object sender, RoutedEventArgs e)
-        {
-            var dialog = new CommonOpenFileDialog
-            {
-                IsFolderPicker = true,
-                InitialDirectory = GetDefaultFileName(ProjectProperties.SaveResultPath)
-            };
-            if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
-            {
-                ProjectProperties.SaveResultPath = dialog.FileName;
-            }
-        }
-
-        // Сохранить проект.
-        private async void SaveProject_Click(object sender, RoutedEventArgs e)
-        {
-            if (string.IsNullOrEmpty(ProjectProperties.ProjectFilePath))
-                SaveAsProject_Click(sender, e);
-            else
-                await WorkProjectService.SaveAsync(MatchingResultModels, ProjectProperties);
-        }
-
-        // Сохранить проект как.
-        private async void SaveAsProject_Click(object sender, RoutedEventArgs e)
-        {
-            var saveFile = new SaveFileDialog()
-            {
-                InitialDirectory = GetDefaultFileName(ProjectProperties.ProjectFilePath),
-                Filter = "Файл проекта List file namer (*.lfn)|*.lfn",
-                FileName = Path.GetFileName(ProjectProperties.ProjectFilePath)
-            };
-            if (saveFile.ShowDialog() == true)
-            {
-                ProjectProperties.ProjectFilePath = saveFile.FileName;
-                await WorkProjectService.SaveAsAsync(MatchingResultModels, ProjectProperties);
-            }
-        }
-
-        // Открыть проект.
-        private void OpenProject_Click(object sender, RoutedEventArgs e)
-        {
-            var folderPath = GetDefaultFileName(ProjectProperties.ProjectFilePath);
-            var project = WorkProjectService.Open(folderPath);
-            if (project != null)
-            {
-                var matchingResults = project.MatchingResults.Adapt<IEnumerable<MatchingResultViewModel>>();
-                ProjectProperties = project.ProjectProperties.Adapt<ProjectPropertiesViewModel>();
-
-                SetMatchingResult(matchingResults);
-            }
-        }
-
-        /// <summary>
-        /// Установить результат сравнения файлов.
-        /// </summary>
-        /// <param name="matchingResults"></param>
-        private void SetMatchingResult(IEnumerable<MatchingResultViewModel> matchingResults)
-        {
-            MatchingResultModels = new ObservableCollection<MatchingResultViewModel>(matchingResults);
-            DocListDG.ItemsSource = MatchingResultModels;
-            RowProperties.DataContext = MatchingResultModels;
-            SaveScanTextBox.DataContext = ProjectProperties;
-
-            SetNewWindowName(ProjectProperties.ProjectFilePath);
-        }
-
         /// <summary>
         /// Получить путь к файлу/папке по умолчанию.
         /// </summary>
@@ -217,17 +111,6 @@ namespace ListFileNamer
                 return Path.GetDirectoryName(fileName);
             else
                 return ProjectProperties.FindScanServicePath;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="windowName"></param>
-        private void SetNewWindowName(string windowName)
-        {
-            var programName = "ListFileNamer";
-            if (!string.IsNullOrEmpty(windowName))
-                Title = windowName + " - " + programName;
-        }
+        }        
     }
 }

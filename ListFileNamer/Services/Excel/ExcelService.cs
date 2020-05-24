@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace ListFileNamer.Services.Excel
 {
@@ -33,32 +34,36 @@ namespace ListFileNamer.Services.Excel
         /// </summary>
         /// <param name="filePath"></param>
         /// <returns></returns>
-        public IEnumerable<ExcelItemModel> GetList()
+        public async Task<IEnumerable<ExcelItemModel>> GetListAsync()
         {
-            var table = GetDataTable(serviceProperties.ExcelServicePath);
-
-            var excelItems = new List<ExcelItemModel>(table.Rows.Count);
-            var idCounter = 1;
-            for (int i = serviceProperties.StartExcelRow - 1; i < serviceProperties.EndExcelRow; i++)
+            return await Task.Run(() =>
             {
-                var tableRow = table.Rows[i];
+                var table = GetDataTable(serviceProperties.ExcelServicePath);
 
-                var item = new ExcelItemModel
+                var excelItems = new List<ExcelItemModel>(table.Rows.Count);
+                var idCounter = 1;
+
+                for (int i = serviceProperties.StartExcelRow - 1; i < serviceProperties.EndExcelRow; i++)
                 {
-                    Id = idCounter++,
-                    SequenceNumber = tableRow[columnNames.SequenceNumber].ToString(),
-                    Name = tableRow[columnNames.Name].ToString(),
-                    Number = tableRow[columnNames.Number].ToString(),
-                    IsPrimary = PrimaryCheck(tableRow[columnNames.SequenceNumber].ToString())
-                };
-                if (int.TryParse(tableRow[columnNames.NumberOfSheets].ToString(), out int numOfSheetsResult))
-                    item.NumberOfSheets = numOfSheetsResult;
-                if (int.TryParse(tableRow[columnNames.PageNumber].ToString(), out int pageNumberResult))
-                    item.PageNumber = pageNumberResult;
+                    var tableRow = table.Rows[i];
 
-                excelItems.Add(item);
-            }
-            return excelItems;
+                    var item = new ExcelItemModel
+                    {
+                        Id = idCounter++,
+                        SequenceNumber = tableRow[columnNames.SequenceNumber].ToString(),
+                        Name = tableRow[columnNames.Name].ToString(),
+                        Number = tableRow[columnNames.Number].ToString(),
+                        IsPrimary = PrimaryCheck(tableRow[columnNames.SequenceNumber].ToString())
+                    };
+                    if (int.TryParse(tableRow[columnNames.NumberOfSheets].ToString(), out int numOfSheetsResult))
+                        item.NumberOfSheets = numOfSheetsResult;
+                    if (int.TryParse(tableRow[columnNames.PageNumber].ToString(), out int pageNumberResult))
+                        item.PageNumber = pageNumberResult;
+
+                    excelItems.Add(item);
+                }
+                return excelItems;
+            });           
         }
 
         /// <summary>

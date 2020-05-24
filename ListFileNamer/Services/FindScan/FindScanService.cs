@@ -71,7 +71,6 @@ namespace ListFileNamer.Services.FindScan
                     SetFolder(model, path);
             }
             return true;
-
         }
 
         /// <summary>
