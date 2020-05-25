@@ -1,4 +1,5 @@
 ﻿using ListFileNamer.Models.Interfaces;
+using ListFileNamer.Services.DocNameDictionary;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -31,8 +32,8 @@ namespace ListFileNamer.Services.FindScan
             for (int i = 0; i < modelsLength; i++)
             {
                 var model = models[i];
-                FindFindFolder(model, previousFolder);
-                FindScanFile(model);
+                SetFindFolder(model, previousFolder);
+                FindAndSetScan(model);
 
                 if (model.IsPrimary)
                     groupId++;
@@ -44,6 +45,29 @@ namespace ListFileNamer.Services.FindScan
         }
 
         /// <summary>
+        /// Установить новый скан для группы записей: найти скан, установить новое имя документа и новое имя файла.
+        /// </summary>
+        /// <param name="matchingResults"></param>
+        public static void FindAndSetScan(IEnumerable<IMatchingResult> matchingResults)
+        {
+            foreach(var result in matchingResults)
+            {
+                FindAndSetScan(result);
+            }
+        }
+
+        /// <summary>
+        /// Установить новый скан для записи: найти скан, установить новое имя документа и новое имя файла.
+        /// </summary>
+        /// <param name="matchingResult"></param>
+        public static void FindAndSetScan(IMatchingResult matchingResult)
+        {
+            FindScanFile(matchingResult);
+            SetNewDocName(matchingResult);
+            SetNewFileName(matchingResult);
+        }
+
+        /// <summary>
         /// Установить новое имя файла.
         /// </summary>
         /// <param name="matchingResult">Модель данных.</param>
@@ -51,11 +75,50 @@ namespace ListFileNamer.Services.FindScan
         public static void SetScanFileName(IMatchingResult matchingResult, string scanFilePath)
         {
             matchingResult.ScanFileName = scanFilePath;
-            matchingResult.NewDocName = Path.GetFileNameWithoutExtension(scanFilePath);
             matchingResult.FileExtension = Path.GetExtension(scanFilePath);
-            matchingResult.NewFileName = $"Стр. {matchingResult.PageNumber}. " +
+            if (string.IsNullOrEmpty(matchingResult.NewDocName))
+            {
+                matchingResult.NewDocName = Path.GetFileNameWithoutExtension(scanFilePath);
+                SetNewFileName(matchingResult);
+            }
+        }
+
+        /// <summary>
+        /// Установить новое имя документа.
+        /// </summary>
+        /// <param name="matchingResult"></param>
+        /// <param name="scanFilePath"></param>
+        public static void SetNewDocName(IMatchingResult matchingResult)
+        {
+            var newDocName = DocNameDictionaryService.GetShortName(matchingResult.DocName);
+            if (!string.IsNullOrEmpty(newDocName))
+            {
+                matchingResult.NewDocName = newDocName + " № " + matchingResult.DocNumber;
+            }
+            else
+            {
+                var scanFilePath = matchingResult.ScanFileName;
+                if (scanFilePath == null)
+                    return;
+                matchingResult.NewDocName = Path.GetFileNameWithoutExtension(scanFilePath);                
+            }
+        }
+
+        /// <summary>
+        /// Установить новое имя файла.
+        /// </summary>
+        /// <param name="matchingResult"></param>
+        public static void SetNewFileName(IMatchingResult matchingResult)
+        {
+            var newFileName = $"Стр. {matchingResult.PageNumber}. " +
                 $"{matchingResult.NewDocName}" +
                 $"{matchingResult.FileExtension}";
+            var invalidChars = Path.GetInvalidFileNameChars();
+            foreach (char c in invalidChars)
+            {
+                newFileName = newFileName.Replace(c, '_');
+            }
+            matchingResult.NewFileName = newFileName;
         }
 
         /// <summary>
@@ -63,7 +126,7 @@ namespace ListFileNamer.Services.FindScan
         /// </summary>
         /// <param name="findModel"></param>
         /// <param name="previousFolderPath"></param>
-        private void FindFindFolder(FindModel findModel, string previousFolderPath)
+        private void SetFindFolder(IMatchingResult findModel, string previousFolderPath)
         {
             Regex actRegex = new Regex(@"[0-2]AJ\.(\d{5,6})\.[C|С]-2\.\d{3}.\d", RegexOptions.IgnoreCase);
 
@@ -96,14 +159,16 @@ namespace ListFileNamer.Services.FindScan
         /// Найти скан документа.
         /// </summary>
         /// <param name="findModel"></param>
-        private void FindScanFile(FindModel findModel)
-        {    
+        private static void FindScanFile(IMatchingResult findModel)
+        {
             var filePathes = GetFolderFiles(findModel.FindFolder);
             findModel.ScanFileNameVariants = filePathes;
-            foreach(var filePath in filePathes)
+            foreach (var filePath in filePathes)
             {
                 var fileName = Path.GetFileNameWithoutExtension(filePath);
-                if (fileName.Contains(findModel.DocNumber))
+                string findFileName = GetDigitsFromText(fileName);
+                string findDocNumber = GetDigitsFromText(findModel.DocNumber);
+                if (findFileName.Contains(findDocNumber) || findDocNumber.Contains(findFileName))
                     SetScanFileName(findModel, filePath);
             }
         }
@@ -111,7 +176,7 @@ namespace ListFileNamer.Services.FindScan
         /// <summary>
         /// Получить список файлов из папки.
         /// </summary>
-        private IEnumerable<string> GetFolderFiles(string folderPath)
+        private static IEnumerable<string> GetFolderFiles(string folderPath)
         {
             IEnumerable<string> fileEntries;
             if (Directory.Exists(folderPath))
@@ -119,6 +184,22 @@ namespace ListFileNamer.Services.FindScan
             else
                 fileEntries = Array.Empty<string>();
             return fileEntries;
+        }
+
+        /// <summary>
+        /// Получить цифры из текста.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        private static string GetDigitsFromText(string text)
+        {
+            string newText = "";
+            for(int i = 0; i < text.Length; i++)
+            {
+                if (char.IsDigit(text[i]))
+                    newText += text[i];
+            }
+            return newText;
         }
     }
 }

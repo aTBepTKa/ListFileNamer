@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="MainWindow.xaml.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Remove="Data\Images\document-empty.png" />
     <None Remove="Data\Images\floppy-disk-digital-data-storage-or-save-interface-symbol.png" />
     <None Remove="Data\Images\floppy-diskette-with-pen.png" />

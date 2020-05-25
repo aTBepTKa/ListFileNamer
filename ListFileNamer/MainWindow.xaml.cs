@@ -64,7 +64,8 @@ namespace ListFileNamer
             if (filePath != null)
             {
                 var item = (MatchingResultViewModel)DocListDG.SelectedItem;
-                FindScanService.SetScanFileName(item, filePath);
+                FileNameComparer.SetScanFileName(item, filePath);
+                
             }
         }
 
@@ -74,6 +75,7 @@ namespace ListFileNamer
             var item = (MatchingResultViewModel)DocListDG.SelectedItem;
             var path = ScanFolderTextBox.Text;            
             FindScanService?.SetScanFolder(item, path);
+            FileNameComparer.FindAndSetScan(item);
         }
 
         // Установить папку сканов для акта и всех документов.
@@ -83,6 +85,7 @@ namespace ListFileNamer
             var groupId = ((MatchingResultViewModel)DocListDG.SelectedItem).GroupId;
             var path = ScanFolderTextBox.Text;
             FindScanService?.SetScanFolder(models, groupId, path);
+            FileNameComparer.FindAndSetScan(models);
         }
 
         // Диалог выбора папки с исходными сканами.

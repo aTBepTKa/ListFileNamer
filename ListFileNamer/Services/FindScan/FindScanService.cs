@@ -75,15 +75,6 @@ namespace ListFileNamer.Services.FindScan
         }
 
         /// <summary>
-        /// Установить новое имя файла.
-        /// </summary>
-        /// <param name="matchingResult">Модель данных.</param>
-        /// <param name="scanFilePath">Имя файла.</param>
-        public static void SetScanFileName(IMatchingResult matchingResult, string scanFilePath) =>
-            FileNameComparer.SetScanFileName(matchingResult, scanFilePath);
-
-
-        /// <summary>
         /// Установить папку поиска скана.
         /// </summary>
         /// <param name="model">Объект записи.</param>

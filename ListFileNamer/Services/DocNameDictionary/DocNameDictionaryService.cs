@@ -2,15 +2,16 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace ListFileNamer.Services.DocNameDictionary
 {
     /// <summary>
     /// Словарь сокращенных наименований документа.
     /// </summary>
-    class DocNameDictionaryService
+    public static class DocNameDictionaryService
     {
-        public DocNameDictionaryService()
+        static DocNameDictionaryService()
         {
             int id = 1;
             DocDictionaryRecords = new List<DocDictionaryRecord>()
@@ -18,54 +19,66 @@ namespace ListFileNamer.Services.DocNameDictionary
                 new DocDictionaryRecord()
                 {
                     Id = id++,
-                    OriginalName = "Акт освидетельствования скрытых работ",
+                    OriginalRegex = "Акт(|а) освидетельствования скрытых работ",
                     ShortName = "АОСР"
                 },
                 new DocDictionaryRecord()
                 {
                     Id = id++,
-                    OriginalName = "Акт",
+                    OriginalRegex = "Акт",
                     ShortName = "Акт"
                 },
                 new DocDictionaryRecord()
                 {
                     Id = id++,
-                    OriginalName = "Сертификат",
+                    OriginalRegex = "Сертификат",
                     ShortName = "Серт."
                 },
                 new DocDictionaryRecord()
                 {
                     Id = id++,
-                    OriginalName = "Паспорт",
+                    OriginalRegex = "Паспорт",
                     ShortName = "Паспорт"
                 },
                 new DocDictionaryRecord()
                 {
                     Id = id++,
-                    OriginalName = "Документ о качестве",
+                    OriginalRegex = "Документ(|а) о качестве",
                     ShortName = "ДК"
                 },
                 new DocDictionaryRecord()
                 {
                     Id = id++,
-                    OriginalName = "Документа о качестве",
-                    ShortName = "ДК"
-                },
-                new DocDictionaryRecord()
-                {
-                    Id = id++,
-                    OriginalName = "Исполнительная схема",
+                    OriginalRegex = "Исполнительн(ая|ой) схем(а|ы)",
                     ShortName = "ИС"
+                },
+                new DocDictionaryRecord()
+                {
+                    Id = id++,
+                    OriginalRegex = "Протокол(|а) испытаний",
+                    ShortName = "ПИ"
+                },
+                new DocDictionaryRecord()
+                {
+                    Id = id++,
+                    OriginalRegex = "Протокол",
+                    ShortName = "Протокол"
+                },
+                new DocDictionaryRecord()
+                {
+                    Id = id++,
+                    OriginalRegex = "Декларац",
+                    ShortName = "Декл."
                 },
             };
         }
 
-        private IEnumerable<DocDictionaryRecord> DocDictionaryRecords { get; set; }
+        private static IEnumerable<DocDictionaryRecord> DocDictionaryRecords { get; set; }
 
         /// <summary>
         /// Сохранить словарь.
         /// </summary>
-        public void SaveDictionary()
+        public static void SaveDictionary()
         {
 
         }
@@ -73,7 +86,7 @@ namespace ListFileNamer.Services.DocNameDictionary
         /// <summary>
         /// Загрузить словарь.
         /// </summary>
-        public void LoadDictionary()
+        public static void LoadDictionary()
         {
 
         }
@@ -83,8 +96,27 @@ namespace ListFileNamer.Services.DocNameDictionary
         /// </summary>
         /// <param name="originalName">Наименование оригинального документа.</param>
         /// <returns></returns>
-        public string GetShortName(string originalName) =>
-            DocDictionaryRecords.FirstOrDefault(x => originalName.Contains(x.OriginalName)).ShortName;
+        public static string GetShortName(string originalName)
+        {
+            // Если оригинал документа содержит ссылку на другой документ и, соотвественно,
+            // в названии имеет "...оригинал в акте...", необходимо исключить из словаря
+            // слово "Акт", у которого Id=2.
+            var LinkText = "акте";
+            IEnumerable<DocDictionaryRecord> dictionaryRecords;
+            if (originalName.Contains(LinkText))
+                dictionaryRecords = DocDictionaryRecords
+                    .Where(x => x.Id != DocDictionaryRecords.FirstOrDefault(i => i.OriginalRegex == "Акт").Id);
+            else
+                dictionaryRecords = DocDictionaryRecords;
+
+            foreach (var dictionaryName in dictionaryRecords)
+            {
+                Regex originalNameRegex = new Regex(dictionaryName.OriginalRegex, RegexOptions.IgnoreCase);
+                if (originalNameRegex.IsMatch(originalName))
+                    return dictionaryName.ShortName;
+            }
+            return null;
+        }
 
     }
 }

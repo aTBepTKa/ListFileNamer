@@ -14,7 +14,7 @@ namespace ListFileNamer.Services.DocNameDictionary
         /// <summary>
         /// Исходное наименование докумена
         /// </summary>
-        public string OriginalName { get; set; }
+        public string OriginalRegex { get; set; }
 
         /// <summary>
         /// Сокращенное наименование документа.

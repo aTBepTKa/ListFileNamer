@@ -65,7 +65,7 @@
             </ToolBar>
         </ToolBarPanel>
 
-        <DataGrid x:Name="DocListDG" 
+        <DataGrid x:Name="DocListDG" RowDetailsVisibilityMode="VisibleWhenSelected"
                         AutoGenerateColumns="False" 
                         VerticalScrollBarVisibility="Auto" 
                         HorizontalScrollBarVisibility="Auto"
