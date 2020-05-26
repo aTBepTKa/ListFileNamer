@@ -18,5 +18,6 @@ namespace ListFileNamer.Services.WorkProject
         public string ProjectFilePath { get; set; }
         public bool IsNewProject { get; set; }
         public string WindowTitle { get; set; }
+        public bool IsShowRowDetailsTemplate { get; set; }
     }
 }

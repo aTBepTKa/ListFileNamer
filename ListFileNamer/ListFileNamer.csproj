@@ -6,15 +6,13 @@
     <UseWPF>true</UseWPF>
   </PropertyGroup>
 
-  <ItemGroup>
-    <Compile Remove="MainWindow.xaml.cs" />
-  </ItemGroup>
 
   <ItemGroup>
     <None Remove="Data\Images\document-empty.png" />
     <None Remove="Data\Images\floppy-disk-digital-data-storage-or-save-interface-symbol.png" />
     <None Remove="Data\Images\floppy-diskette-with-pen.png" />
     <None Remove="Data\Images\floppy-disks-pair.png" />
+    <None Remove="Data\Images\numbered-list-style.png" />
     <None Remove="Data\Images\open-folder-black-and-white-variant.png" />
     <None Remove="Data\Images\open-folder-with-document.png" />
   </ItemGroup>
@@ -36,6 +34,7 @@
     <Resource Include="Data\Images\floppy-disk-digital-data-storage-or-save-interface-symbol.png" />
     <Resource Include="Data\Images\floppy-diskette-with-pen.png" />
     <Resource Include="Data\Images\floppy-disks-pair.png" />
+    <Resource Include="Data\Images\numbered-list-style.png" />
     <Resource Include="Data\Images\open-folder-black-and-white-variant.png" />
     <Resource Include="Data\Images\open-folder-with-document.png" />
   </ItemGroup>

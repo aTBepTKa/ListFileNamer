@@ -18,5 +18,10 @@ namespace ListFileNamer.Services.WorkProject
         /// Проект является новым, путь для сохранения не назнчаен.
         /// </summary>
         bool IsNewProject { get; set; }
+
+        /// <summary>
+        /// Показывать примечания к строке в DataGrid.
+        /// </summary>
+        bool IsShowRowDetailsTemplate { get; set; }
     }
 }

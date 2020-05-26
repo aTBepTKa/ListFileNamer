@@ -14,7 +14,7 @@ namespace ListFileNamer.Models
         private string saveResultPath;
         private string projectFilePath;
         private bool isNewProject = true;
-        private string windowTitle = "List File Namer";
+        private bool isShowRowDetailsTemplate = true;
 
         public string ExcelServicePath { get; set; }
         public int StartExcelRow { get; set; }
@@ -31,6 +31,7 @@ namespace ListFileNamer.Models
             }
         }
         public bool IsNewProject { get => isNewProject; set => SetField(ref isNewProject, value, "IsNewProject"); }
+        public bool IsShowRowDetailsTemplate { get => isShowRowDetailsTemplate; set => SetField(ref isShowRowDetailsTemplate, value, "IsShowRowDetailsTemplate"); }
 
         private bool SetField<T>(ref T field, T value, string propertyName)
         {

@@ -21,6 +21,7 @@
         </Style>
         <converters:FileNameConverter x:Key="fileNameConverter"/>
         <converters:BooleanConverter x:Key="booleanConverter"/>
+        <converters:ShowRowDetailsConverter x:Key="rowDetailsConverter"/>
         <System:Double x:Key="ToolbarButtonWidth">32</System:Double>
     </Window.Resources>
 
@@ -62,15 +63,22 @@
                 <Button x:Name="SaveScanButton" ToolTip="Сохранить сканы" Click="SaveScanButton_Click" Width="{DynamicResource ToolbarButtonWidth}">
                     <Image Source="\data\images\floppy-disks-pair.png"/>
                 </Button>
+                <Separator/>
+                <CheckBox Name="ShowDetailsCheckBox" IsChecked="{Binding IsShowRowDetailsTemplate}" ToolTip="Показывать данные под строкой" 
+                          Width="{DynamicResource ToolbarButtonWidth}">
+                    <Image Source="\data\images\numbered-list-style.png"/>
+                </CheckBox>
             </ToolBar>
         </ToolBarPanel>
 
-        <DataGrid x:Name="DocListDG" RowDetailsVisibilityMode="VisibleWhenSelected"
-                        AutoGenerateColumns="False" 
-                        VerticalScrollBarVisibility="Auto" 
-                        HorizontalScrollBarVisibility="Auto"
-                        IsSynchronizedWithCurrentItem="True"
-                        SelectionMode="Single" Grid.Row="1">
+        <DataGrid x:Name="DocListDG" 
+                    RowDetailsVisibilityMode="{Binding ElementName=ShowDetailsCheckBox, Path=IsChecked, Converter={StaticResource rowDetailsConverter}}"
+                    AutoGenerateColumns="False" 
+                    VerticalScrollBarVisibility="Auto" 
+                    HorizontalScrollBarVisibility="Auto"
+                    IsSynchronizedWithCurrentItem="True"
+                    SelectionMode="Single" 
+                    Grid.Row="1">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Id" Binding="{Binding Id}" Width="30" IsReadOnly="True"/>
                 <DataGridTextColumn Header="Папка" Binding="{Binding FindFolder}" ElementStyle="{StaticResource TextWrapping}" Width="200" IsReadOnly="True">
@@ -112,7 +120,7 @@
                                 <Condition Binding="{Binding Path=IsPrimary}" Value="True"/>
                             </MultiDataTrigger.Conditions>
                             <MultiDataTrigger.Setters>
-                                <!--<Setter Property="Background" Value="LightGreen"/>-->
+                                <Setter Property="Background" Value="LightBlue"/>
                                 <Setter Property="FontWeight" Value="Bold"/>
                             </MultiDataTrigger.Setters>
                         </MultiDataTrigger>

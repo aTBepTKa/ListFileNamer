@@ -163,10 +163,13 @@ namespace ListFileNamer.Services.FindScan
         {
             var filePathes = GetFolderFiles(findModel.FindFolder);
             findModel.ScanFileNameVariants = filePathes;
+
             foreach (var filePath in filePathes)
             {
                 var fileName = Path.GetFileNameWithoutExtension(filePath);
                 string findFileName = GetDigitsFromText(fileName);
+                if (string.IsNullOrEmpty(findFileName))
+                    continue;
                 string findDocNumber = GetDigitsFromText(findModel.DocNumber);
                 if (findFileName.Contains(findDocNumber) || findDocNumber.Contains(findFileName))
                     SetScanFileName(findModel, filePath);
@@ -183,6 +186,26 @@ namespace ListFileNamer.Services.FindScan
                 fileEntries = Directory.GetFiles(folderPath);
             else
                 fileEntries = Array.Empty<string>();
+            return fileEntries;
+        }
+
+        /// <summary>
+        /// Получить список файлов из папки с подпапками.
+        /// </summary>
+        /// <param name="folderPath"></param>
+        /// <returns></returns>
+        private static IEnumerable<string> GetSubFolderFiles(string folderPath)
+        {
+            List<string> fileEntries = new List<string>();
+            if (Directory.Exists(folderPath))
+            {
+                fileEntries.AddRange(Directory.GetFiles(folderPath));
+                var directories = Directory.GetDirectories(folderPath);
+                foreach (var directory in directories)
+                {
+                    fileEntries.AddRange(Directory.GetFiles(directory));
+                }
+            }
             return fileEntries;
         }
 
