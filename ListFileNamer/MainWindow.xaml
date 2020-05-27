@@ -22,6 +22,7 @@
         <converters:FileNameConverter x:Key="fileNameConverter"/>
         <converters:BooleanConverter x:Key="booleanConverter"/>
         <converters:ShowRowDetailsConverter x:Key="rowDetailsConverter"/>
+        <converters:IsEmptyStringConverter x:Key="isEmptyStringConverter"/>
         <System:Double x:Key="ToolbarButtonWidth">32</System:Double>
     </Window.Resources>
 
@@ -78,6 +79,8 @@
                     HorizontalScrollBarVisibility="Auto"
                     IsSynchronizedWithCurrentItem="True"
                     SelectionMode="Single" 
+                    CanUserAddRows="False"
+                    CanUserDeleteRows="False"
                     Grid.Row="1">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Id" Binding="{Binding Id}" Width="30" IsReadOnly="True"/>
@@ -96,7 +99,18 @@
                 <DataGridTextColumn Header="Стр." Binding="{Binding PageNumber}" Width="40" IsReadOnly="True"/>
                 <DataGridTextColumn Header="Наименование документа" Binding="{Binding DocName}" ElementStyle="{StaticResource TextWrapping}" Width="200" IsReadOnly="True"/>
                 <DataGridTextColumn Header="Номер д-та" Binding="{Binding DocNumber}" ElementStyle="{StaticResource TextWrapping}" Width="80" IsReadOnly="True"/>
-                <DataGridTextColumn Header="Имя файла" Binding="{Binding Path=ScanFileName, Converter={StaticResource fileNameConverter}}" ElementStyle="{StaticResource TextWrapping}" Width="100" IsReadOnly="True"/>
+                <DataGridTextColumn Header="Имя файла" Binding="{Binding Path=ScanFileName, Converter={StaticResource fileNameConverter}}" 
+                                    ElementStyle="{StaticResource TextWrapping}" Width="100" IsReadOnly="True">
+                    <DataGridTextColumn.CellStyle>
+                        <Style TargetType="DataGridCell">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Path=ScanFileName, Converter={StaticResource isEmptyStringConverter}}" Value="True">
+                                    <Setter Property="Background" Value="Tomato"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </DataGridTextColumn.CellStyle>
+                </DataGridTextColumn>
                 <DataGridTextColumn x:Name="NewDocNameTextBox" Header="Новое имя д-та" Binding="{Binding NewDocName}" ElementStyle="{StaticResource TextWrapping}" Width="100" Visibility="Collapsed"/>
                 <DataGridTextColumn Header="Новое имя файла" Binding="{Binding NewFileName}" ElementStyle="{StaticResource TextWrapping}" Width="110"/>
             </DataGrid.Columns>
