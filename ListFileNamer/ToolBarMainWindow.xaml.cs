@@ -36,11 +36,13 @@ namespace ListFileNamer
                 {
                     ExcelService = new ExcelService(ProjectProperties);
                     var excelListTask = ExcelService.GetListAsync();
-                    FindScanService = new FindScanService(ProjectProperties);
-                    var result = FindScanService.GetMatchingResultFromExcel(await excelListTask).Adapt<IEnumerable<MatchingResultViewModel>>();
-                    LoadProject(result);
 
-                    excelListTask.Wait();
+                    FindScanService = new FindScanService(ProjectProperties);                    
+                    var resultTask = FindScanService.GetMatchingResultFromExcelAsync(await excelListTask);
+                    var resultModel = (await resultTask).Adapt<IEnumerable<MatchingResultViewModel>>();
+                    LoadProject(resultModel);
+
+                    resultTask.Wait();
                     LoadProgressBar.IsIndeterminate = false;
                     StatusLabel.Content = "Перечень загружен";
                     SetNewWindowName("Новый проект");

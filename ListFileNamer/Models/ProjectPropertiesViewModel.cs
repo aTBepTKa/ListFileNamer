@@ -14,7 +14,7 @@ namespace ListFileNamer.Models
         private string saveResultPath;
         private string projectFilePath;
         private bool isNewProject = true;
-        private bool isShowRowDetailsTemplate = true;
+        private bool isShowRowDetailsTemplate = false;
 
         public string ExcelServicePath { get; set; }
         public int StartExcelRow { get; set; }

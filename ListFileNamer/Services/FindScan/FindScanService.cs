@@ -5,6 +5,7 @@ using Mapster;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace ListFileNamer.Services.FindScan
 {
@@ -25,20 +26,23 @@ namespace ListFileNamer.Services.FindScan
         /// </summary>
         /// <param name="excelItems">Документы перечня.</param>
         /// <returns></returns>
-        public IEnumerable<FindModel> GetMatchingResultFromExcel(IEnumerable<ExcelItemModel> excelItems)
+        public async Task<IEnumerable<FindModel>> GetMatchingResultFromExcelAsync(IEnumerable<ExcelItemModel> excelItems)
         {
-            FindModels = excelItems.Select(x => new FindModel
+            return await Task.Run(() =>
             {
-                Id = x.Id,
-                PageNumber = x.PageNumber,
-                DocName = x.Name,
-                DocNumber = x.Number,
-                IsPrimary = x.IsPrimary
-            }).ToArray();
+                FindModels = excelItems.Select(x => new FindModel
+                {
+                    Id = x.Id,
+                    PageNumber = x.PageNumber,
+                    DocName = x.Name,
+                    DocNumber = x.Number,
+                    IsPrimary = x.IsPrimary
+                }).ToArray();
 
-            var comparer = new FileNameComparer(baseFolderPath);
-            var compareResult = comparer.GetMatchingResults(FindModels);
-            return compareResult;
+                var comparer = new FileNameComparer(baseFolderPath);
+                var compareResult = comparer.GetMatchingResults(FindModels);
+                return compareResult;
+            });
         }
 
         /// <summary>

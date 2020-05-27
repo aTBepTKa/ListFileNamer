@@ -1,22 +1,12 @@
-﻿using ListFileNamer.Services;
-using Microsoft.Win32;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
-using System.IO;
-using Microsoft.WindowsAPICodePack.Dialogs;
-using System.Text.RegularExpressions;
-using ListFileNamer.Services.Excel;
+﻿using ListFileNamer.Models;
 using ListFileNamer.Models.Interfaces;
-using ListFileNamer.Models;
+using Microsoft.Win32;
+using Microsoft.WindowsAPICodePack.Dialogs;
+using System;
+using System.IO;
+using System.Text.RegularExpressions;
+using System.Windows;
+using System.Windows.Input;
 
 namespace ListFileNamer
 {
@@ -43,11 +33,13 @@ namespace ListFileNamer
         {
             var openFileDialog = new OpenFileDialog
             {
-                Filter = "Таблица excel |*.xls; *.xlsx; *.xlsm"
+                Filter = "Таблица excel |*.xls; *.xlsx; *.xlsm",
+                InitialDirectory = Path.GetDirectoryName(DocListPathTextBox.Text)
             };
             if (openFileDialog.ShowDialog() == true)
             {
                 DocListPathTextBox.Text = openFileDialog.FileName;
+                ScanPathTextBox.Text = Path.GetDirectoryName(openFileDialog.FileName);
             }
         }
 
@@ -55,7 +47,8 @@ namespace ListFileNamer
         {
             var dialog = new CommonOpenFileDialog
             {
-                IsFolderPicker = true
+                IsFolderPicker = true,
+                InitialDirectory = ScanPathTextBox.Text
             };
             if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
                 ScanPathTextBox.Text = dialog.FileName;
@@ -79,12 +72,12 @@ namespace ListFileNamer
             var startRowText = FirstRowTextBox.Text;
             var lastRowText = LastRowTextBox.Text;
 
-            if(!int.TryParse(startRowText, out int startRowInt))
+            if (!int.TryParse(startRowText, out int startRowInt))
             {
                 MessageBox.Show("Не корректное значение первой строки.", "Ошибка при получении строки", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
-            if(!int.TryParse(lastRowText, out int lastRowInt))
+            if (!int.TryParse(lastRowText, out int lastRowInt))
             {
                 MessageBox.Show("Не корректное значение последней строки.", "Ошибка при получении строки", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
@@ -105,7 +98,7 @@ namespace ListFileNamer
         {
             DialogResult = false;
         }
-        
+
         private static bool IsTextAllowed(string text) =>
             !integerRegex.IsMatch(text);
 

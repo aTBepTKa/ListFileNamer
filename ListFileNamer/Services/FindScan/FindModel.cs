@@ -10,6 +10,8 @@ namespace ListFileNamer.Services.FindScan
     /// </summary>
     public class FindModel : IMatchingResult
     {
+        private string findFolder;
+
         /// <summary>
         /// Id документа из перечня.
         /// </summary>
@@ -39,6 +41,11 @@ namespace ListFileNamer.Services.FindScan
         public bool IsAct { get; set; }
 
         /// <summary>
+        /// Структура папок соответствует структуре выгруженных документов из ИСУП.
+        /// </summary>
+        public bool IsIsup { get; set; }
+
+        /// <summary>
         /// Наименование документа из перечня
         /// </summary>
         public string DocName { get; set; }
@@ -51,7 +58,18 @@ namespace ListFileNamer.Services.FindScan
         /// <summary>
         /// Папка для выполнения поиска документа.
         /// </summary>
-        public string FindFolder { get; set; }
+        public string FindFolder
+        {
+            get => findFolder;
+            set
+            {                
+                findFolder = value;
+                if (string.IsNullOrEmpty(value))
+                    FindFolderIsExist = false;
+                else
+                    FindFolderIsExist = true;
+            }
+        }
 
         /// <summary>
         /// Папка для документа существует.

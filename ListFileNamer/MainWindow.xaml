@@ -97,7 +97,7 @@
                 <DataGridTextColumn Header="Наименование документа" Binding="{Binding DocName}" ElementStyle="{StaticResource TextWrapping}" Width="200" IsReadOnly="True"/>
                 <DataGridTextColumn Header="Номер д-та" Binding="{Binding DocNumber}" ElementStyle="{StaticResource TextWrapping}" Width="80" IsReadOnly="True"/>
                 <DataGridTextColumn Header="Имя файла" Binding="{Binding Path=ScanFileName, Converter={StaticResource fileNameConverter}}" ElementStyle="{StaticResource TextWrapping}" Width="100" IsReadOnly="True"/>
-                <DataGridTextColumn x:Name="NewDocNameTextBox" Header="Новое имя д-та" Binding="{Binding NewDocName}" ElementStyle="{StaticResource TextWrapping}" Width="100"/>
+                <DataGridTextColumn x:Name="NewDocNameTextBox" Header="Новое имя д-та" Binding="{Binding NewDocName}" ElementStyle="{StaticResource TextWrapping}" Width="100" Visibility="Collapsed"/>
                 <DataGridTextColumn Header="Новое имя файла" Binding="{Binding NewFileName}" ElementStyle="{StaticResource TextWrapping}" Width="110"/>
             </DataGrid.Columns>
 
@@ -110,7 +110,7 @@
                                 <Condition Binding="{Binding Path=IsPrimary}" Value="True"/>
                             </MultiDataTrigger.Conditions>
                             <MultiDataTrigger.Setters>
-                                <!--<Setter Property="Background" Value="LightSkyBlue"/>-->
+                                <Setter Property="Background" Value="GhostWhite"/>
                                 <Setter Property="FontWeight" Value="Bold"/>
                             </MultiDataTrigger.Setters>
                         </MultiDataTrigger>
@@ -169,13 +169,30 @@
             </GroupBox>
 
             <GroupBox Header="Содержимое папки" DockPanel.Dock="Top">
-                <ListBox x:Name="ListBoxRowProrepty" ItemsSource="{Binding ScanFileNameVariants}" SelectionChanged="ListBoxRowTemplate_SelectionChanged">
-                    <ListBox.ItemTemplate>
-                        <DataTemplate>
-                            <TextBlock Text="{Binding Converter={StaticResource fileNameConverter}}" TextWrapping="Wrap"/>
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                </ListBox>
+                    <ListBox x:Name="ListBoxRowProrepty" ItemsSource="{Binding ScanFileNameVariants}" 
+                             SelectionChanged="ListBoxRowTemplate_SelectionChanged"
+                             ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                             AlternationCount="2">
+                        <ListBox.ItemContainerStyle>
+                        <Style TargetType="{x:Type ListBoxItem}">
+                            <Style.Triggers>
+                                <Trigger Property="ListBox.AlternationIndex" Value="0">
+                                    <Setter Property="Background" Value="White"/>
+                                </Trigger>
+                                <Trigger Property="ListBox.AlternationIndex" Value="1">
+                                    <Setter Property="Background" Value="LightGray"/>
+                                </Trigger>
+                            </Style.Triggers>
+                            </Style>
+                        </ListBox.ItemContainerStyle>
+                        <ListBox.ItemTemplate>                            
+                            <DataTemplate>
+                                <Grid>
+                                    <TextBlock Text="{Binding Converter={StaticResource fileNameConverter}}" TextWrapping="Wrap"/>                                   
+                                </Grid>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>                    
+                    </ListBox>       
             </GroupBox>
         </DockPanel>
         <StatusBar Grid.Row="3" Grid.ColumnSpan="2">

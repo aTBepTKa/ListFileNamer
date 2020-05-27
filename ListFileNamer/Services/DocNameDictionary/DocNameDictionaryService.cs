@@ -70,26 +70,22 @@ namespace ListFileNamer.Services.DocNameDictionary
                     OriginalRegex = "Декларац",
                     ShortName = "Декл."
                 },
+                new DocDictionaryRecord()
+                {
+                    Id = id++,
+                    OriginalRegex = "Письм.",
+                    ShortName = "Письмо"
+                },
+                new DocDictionaryRecord()
+                {
+                    Id = id++,
+                    OriginalRegex = "Удостоверен.",
+                    ShortName = "Удостоверение"
+                },
             };
         }
 
         private static IEnumerable<DocDictionaryRecord> DocDictionaryRecords { get; set; }
-
-        /// <summary>
-        /// Сохранить словарь.
-        /// </summary>
-        public static void SaveDictionary()
-        {
-
-        }
-
-        /// <summary>
-        /// Загрузить словарь.
-        /// </summary>
-        public static void LoadDictionary()
-        {
-
-        }
 
         /// <summary>
         /// Получить сокращенное наименование документа из словаря.
@@ -100,7 +96,7 @@ namespace ListFileNamer.Services.DocNameDictionary
         {
             // Если оригинал документа содержит ссылку на другой документ и, соотвественно,
             // в названии имеет "...оригинал в акте...", необходимо исключить из словаря
-            // слово "Акт", у которого Id=2.
+            // слово "Акт".
             var LinkText = "акте";
             IEnumerable<DocDictionaryRecord> dictionaryRecords;
             if (originalName.Contains(LinkText))
