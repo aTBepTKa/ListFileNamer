@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.IO.Compression;
 using Mapster;
 using Microsoft.Win32;
+using System.Linq;
 
 namespace ListFileNamer.Services.WorkProject
 {
@@ -37,6 +38,7 @@ namespace ListFileNamer.Services.WorkProject
                     MatchingResults = matchingResult.Adapt<IEnumerable<MatchingResultFile>>(),
                     ProjectProperties = projectProperties.Adapt<ProjectPropertiesFile>()
                 };
+                
                 // Поток записи в файл
                 using var fileStream = new FileStream(projectProperties.ProjectFilePath, FileMode.OpenOrCreate);
                 using var zipStream = new GZipStream(fileStream, CompressionLevel.Optimal);

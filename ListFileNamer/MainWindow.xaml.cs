@@ -88,7 +88,7 @@ namespace ListFileNamer
             if (string.IsNullOrEmpty(path))
                 return;
             FindScanService?.SetScanFolder(models, groupId, path);
-            FileNameComparer.FindAndSetScan(models, path);
+            FileNameComparer.FindAndSetScan(models, groupId, path);
         }
 
         // Диалог выбора папки с исходными сканами.

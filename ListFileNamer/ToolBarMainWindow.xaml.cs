@@ -47,6 +47,11 @@ namespace ListFileNamer
                     StatusLabel.Content = "Перечень загружен";
                     SetNewWindowName("Новый проект");
                 }
+                catch(IOException ex)
+                {
+                    LoadProgressBar.IsIndeterminate = false;
+                    MessageBox.Show($"Ошибка при открытии файла, файл занят другим процессом. Попробуйте закрыть Excel.\n{ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
                 catch (Exception ex)
                 {
                     LoadProgressBar.IsIndeterminate = false;
@@ -133,6 +138,7 @@ namespace ListFileNamer
             DocListDG.ItemsSource = MatchingResultModels;
             RowProperties.DataContext = MatchingResultModels;
             SaveScanTextBox.DataContext = ProjectProperties;
+            DataContext = ProjectProperties;
 
             // Настройки интерфейса
             SetNewWindowName(ProjectProperties.ProjectFilePath);

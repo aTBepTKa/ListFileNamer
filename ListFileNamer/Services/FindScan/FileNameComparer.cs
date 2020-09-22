@@ -170,11 +170,12 @@ namespace ListFileNamer.Services.FindScan
         /// Установить новый скан для группы записей: найти скан, установить новое имя документа и новое имя файла.
         /// </summary>
         /// <param name="matchingResults"></param>
-        public static void FindAndSetScan(IEnumerable<IMatchingResult> matchingResults, string folder)
+        public static void FindAndSetScan(IEnumerable<IMatchingResult> matchingResults,  int groupId, string folder)
         {
             foreach (var result in matchingResults)
             {
-                FindAndSetScan(result, folder);
+                if(result.GroupId == groupId)
+                    FindAndSetScan(result, folder);
             }
         }
 
